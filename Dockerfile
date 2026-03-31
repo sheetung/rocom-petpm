@@ -1,7 +1,5 @@
-FROM node:22-alpine AS builder
+﻿FROM node:22-alpine AS builder
 WORKDIR /app
-
-RUN apk add --no-cache python3 make g++
 
 COPY package.json package-lock.json ./
 COPY apps/web/package.json ./apps/web/package.json
