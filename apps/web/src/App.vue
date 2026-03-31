@@ -9,6 +9,7 @@ const completingId = ref(null);
 const error = ref("");
 const success = ref("");
 const showUserModal = ref(false);
+const showRequestModal = ref(false);
 const authMode = ref("login");
 
 const eggGroups = ref([]);
@@ -255,6 +256,7 @@ async function createRequestCard() {
       })
     });
     success.value = "求蛋卡片已发布。";
+    showRequestModal.value = false;
     form.value = { wantedPet: "", offeredPet: "", note: "" };
     requestUsername.value = userProfile.value.username;
     await refreshRequests();
@@ -371,19 +373,8 @@ onMounted(() => {
 
         <section v-else class="side-card">
           <p class="side-label">发布求蛋</p>
-          <div class="field">
-            <label>想要的宠物蛋</label>
-            <input v-model="form.wantedPet" list="pet-names" type="text" placeholder="必填" />
-          </div>
-          <div class="field">
-            <label>可提供的宠物</label>
-            <input v-model="form.offeredPet" list="pet-names" type="text" placeholder="选填" />
-          </div>
-          <div class="field">
-            <label>补充说明</label>
-            <textarea v-model="form.note" rows="4" placeholder="选填"></textarea>
-          </div>
-          <button class="primary-btn full-btn" :disabled="saving" @click="createRequestCard">{{ saving ? '发布中...' : '发布求蛋卡片' }}</button>
+          <p class="side-copy small-copy">发布入口改成弹出卡片，左侧只保留一个操作按钮。</p>
+          <button class="primary-btn full-btn" @click="showRequestModal = true">发布求蛋卡片</button>
 
           <p class="side-label top-gap">广场筛选</p>
           <div class="field">
@@ -480,6 +471,30 @@ onMounted(() => {
       </main>
     </div>
 
+    <div v-if="showRequestModal" class="modal-backdrop" @click.self="showRequestModal = false">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div>
+            <p class="side-label">发布求蛋</p>
+            <h3>填写求蛋卡片</h3>
+          </div>
+          <button class="ghost-btn" @click="showRequestModal = false">关闭</button>
+        </div>
+        <div class="field">
+          <label>想要的宠物蛋</label>
+          <input v-model="form.wantedPet" list="pet-names" type="text" placeholder="必填" />
+        </div>
+        <div class="field">
+          <label>可提供的宠物</label>
+          <input v-model="form.offeredPet" list="pet-names" type="text" placeholder="选填" />
+        </div>
+        <div class="field">
+          <label>补充说明</label>
+          <textarea v-model="form.note" rows="4" placeholder="选填"></textarea>
+        </div>
+        <button class="primary-btn full-btn" :disabled="saving" @click="createRequestCard">{{ saving ? '发布中...' : '发布求蛋卡片' }}</button>
+      </div>
+    </div>
     <div v-if="showUserModal" class="modal-backdrop" @click.self="showUserModal = false">
       <div class="modal-card">
         <div class="modal-head">
@@ -514,6 +529,7 @@ onMounted(() => {
     </datalist>
   </div>
 </template>
+
 
 
 
