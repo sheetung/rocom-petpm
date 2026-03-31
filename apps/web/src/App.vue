@@ -54,7 +54,7 @@ const currentViewDescription = computed(() =>
 );
 
 function imageUrl(petName) {
-  return `/pet-img/${petName}.PNG`;
+  return `/pet-img/${petName}.png`;
 }
 
 function loadUserProfile() {
@@ -537,6 +537,7 @@ onMounted(() => {
     </datalist>
   </div>
 </template>
+
 
 
 
