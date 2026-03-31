@@ -1,0 +1,6 @@
+﻿node_modules/
+dist/
+apps/api/storage/*.db
+apps/api/storage/*.db-shm
+apps/api/storage/*.db-wal
+.env

@@ -1,0 +1,8 @@
+﻿node_modules
+dist
+.git
+.gitignore
+.env
+apps/api/storage/*.db
+apps/api/storage/*.db-shm
+apps/api/storage/*.db-wal

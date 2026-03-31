@@ -1,0 +1,10 @@
+﻿version: "3.9"
+services:
+  rocom-petplus:
+    build: .
+    container_name: rocom-petplus
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/api/storage:/app/apps/api/storage
+    restart: unless-stopped
