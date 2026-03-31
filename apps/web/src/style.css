@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   color: #312b3a;
   background:
     radial-gradient(circle at top left, rgba(255, 220, 170, 0.55), transparent 28%),
@@ -59,6 +59,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .field { display: flex; flex-direction: column; gap: 8px; }
 .field label { font-size: 13px; font-weight: 700; color: #5d5267; }
 .field input, .field textarea, .field select { width: 100%; padding: 13px 14px; border: 1px solid #eadfd1; border-radius: 16px; background: #fffefc; }
+.field textarea { min-height: 120px; max-height: 200px; resize: vertical; }
 .primary-btn, .ghost-btn { align-self: end; min-height: 48px; border-radius: 16px; padding: 0 20px; font-weight: 700; }
 .full-btn { width: 100%; }
 .primary-btn { color: #fff; background: linear-gradient(135deg, #ef7f8c, #ffab7f); }
@@ -71,6 +72,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .focus-card h3 { margin: 0 0 4px; font-size: 24px; }
 .focus-card p { margin: 0; color: #7d7484; }
 .chip-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.chip-row-top { margin-bottom: 20px; }
 .filter-chip { padding: 10px 16px; border-radius: 999px; color: #5b5062; background: #f8efe8; }
 .filter-chip.active, .filter-chip:hover { color: #fff; background: linear-gradient(135deg, #dd5b72, #ff9e73); }
 .auth-switch { display: flex; gap: 10px; margin-bottom: 16px; }
@@ -97,6 +99,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .request-meta dt { color: #8a7d89; font-size: 13px; }
 .request-meta dd { margin: 0; font-weight: 700; word-break: break-all; }
 .request-note { margin: 14px 0 0; line-height: 1.7; }
+.request-note-value { font-weight: 600; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
 .modal-backdrop { position: fixed; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(45, 27, 33, .32); backdrop-filter: blur(6px); }
 .modal-card { width: min(480px, 100%); }
 .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
@@ -111,3 +114,6 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .focus-image { width: 120px; }
   .user-actions { justify-content: flex-start; }
 }
+
+
+
