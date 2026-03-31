@@ -71,6 +71,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .focus-card h3 { margin: 0 0 4px; font-size: 24px; }
 .focus-card p { margin: 0; color: #7d7484; }
 .chip-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.chip-row-top { margin-bottom: 18px; }
 .filter-chip { padding: 10px 16px; border-radius: 999px; color: #5b5062; background: #f8efe8; }
 .filter-chip.active, .filter-chip:hover { color: #fff; background: linear-gradient(135deg, #dd5b72, #ff9e73); }
 .auth-switch { display: flex; gap: 10px; margin-bottom: 16px; }
@@ -111,3 +112,4 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .focus-image { width: 120px; }
   .user-actions { justify-content: flex-start; }
 }
+
