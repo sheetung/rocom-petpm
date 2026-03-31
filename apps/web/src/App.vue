@@ -401,6 +401,11 @@ onMounted(() => {
 
       <main class="content-panel">
         <section v-if="view === 'breed'" class="panel panel-main">
+          <div class="chip-row chip-row-top">
+            <button class="filter-chip" :class="{ active: breedGroup === '' }" @click="breedGroup = ''; refreshPets()">全部</button>
+            <button v-for="group in eggGroups" :key="`chip-${group}`" class="filter-chip" :class="{ active: breedGroup === group }" @click="breedGroup = group; refreshPets()">{{ group }}</button>
+          </div>
+
           <div v-if="selectedPet" class="focus-card">
             <div class="focus-image">
               <img :src="imageUrl(selectedPet.name)" :alt="selectedPet.name" @error="$event.target.style.visibility = 'hidden'" />
@@ -419,11 +424,6 @@ onMounted(() => {
               <strong>{{ pet.name }}</strong>
               <span>{{ pet.groups.join(' / ') }}</span>
             </article>
-          </div>
-
-          <div class="chip-row">
-            <button class="filter-chip" :class="{ active: breedGroup === '' }" @click="breedGroup = ''; refreshPets()">全部</button>
-            <button v-for="group in eggGroups" :key="`chip-${group}`" class="filter-chip" :class="{ active: breedGroup === group }" @click="breedGroup = group; refreshPets()">{{ group }}</button>
           </div>
 
           <div class="card-grid wide-grid">
@@ -503,4 +503,6 @@ onMounted(() => {
     </datalist>
   </div>
 </template>
+
+
 
