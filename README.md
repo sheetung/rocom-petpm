@@ -1,10 +1,7 @@
 ﻿# rocom-petplus-node
 
-一个适合部署到 1Panel 的单容器版本，包含：
+一个基于 Vue + Node + SQLite 的单容器 Docker 版本，包含：
 
-- Vue 3 前端
-- Fastify API
-- SQLite 数据库存储
 - 蛋组查询
 - 可配对宠物查询
 - 求蛋广场发布与检索
@@ -16,15 +13,51 @@
 - SQLite
 - Docker
 
+## 项目结构
+
+- `apps/web`：前端源码
+- `apps/api`：Node API 与 SQLite 访问逻辑
+- `apps/api/storage`：SQLite 数据文件目录
+- `data/pets.json`：宠物与蛋组种子数据
+- `Dockerfile`：单容器构建文件
+- `docker-compose.yml`：本地或服务器启动文件
+
 ## 本地开发
 
-1. `npm install`
-2. `npm run dev:api`
-3. `npm run dev:web`
+1. 安装依赖
 
-前端默认运行在 `5173`，并把 `/api` 代理到 `3000`。
+```bash
+npm install
+```
 
-## Docker 运行
+2. 启动 API
+
+```bash
+npm run dev:api
+```
+
+3. 启动前端
+
+```bash
+npm run dev:web
+```
+
+默认情况下：
+
+- 前端运行在 `http://localhost:5173`
+- API 运行在 `http://localhost:3000`
+
+## 构建前端
+
+```bash
+npm run build:web
+```
+
+构建产物会输出到：
+
+- `apps/web/dist`
+
+## Docker 部署
 
 ### 构建镜像
 
@@ -32,7 +65,7 @@
 docker build -t rocom-petplus-node .
 ```
 
-### 运行容器
+### 启动容器
 
 ```bash
 docker run -d \
@@ -42,46 +75,56 @@ docker run -d \
   rocom-petplus-node
 ```
 
-### 或使用 compose
+### 使用 compose
 
 ```bash
 docker compose up -d --build
 ```
 
-## 1Panel 部署思路
+## 访问方式
 
-推荐直接用 Docker / Compose 部署，不再拆分静态站点和 Node 服务。
+容器启动后，服务默认监听：
 
-容器启动后：
+- `http://localhost:3000`
 
-- 首页由 Node 直接提供 Vue 构建产物
-- `/api/*` 由同一个 Node 服务提供
-- SQLite 数据保存在挂载目录 `apps/api/storage`
+Node 会同时提供：
 
-你只需要在 1Panel 中：
+- 前端页面
+- `/api/*` 接口
+- `pet-img` 静态资源
 
-1. 上传整个项目目录
-2. 用 Docker Compose 或容器方式启动
-3. 把域名反向代理到容器端口 `3000`
-
-## 数据库
+## 数据持久化
 
 SQLite 文件默认位置：
 
 - `apps/api/storage/app.db`
 
-首次启动 API 时会自动建表并导入：
+首次启动时会自动：
 
-- `data/pets.json`
+1. 创建数据库
+2. 建表
+3. 导入 `data/pets.json`
 
-## 生产反向代理示例
+为了避免容器重建导致数据丢失，请务必挂载：
 
-```nginx
-location / {
-    proxy_pass http://127.0.0.1:3000;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-}
+- `apps/api/storage`
+
+## 常用命令
+
+查看容器日志：
+
+```bash
+docker logs rocom-petplus
+```
+
+停止并删除容器：
+
+```bash
+docker rm -f rocom-petplus
+```
+
+使用 compose 查看日志：
+
+```bash
+docker compose logs -f
 ```
