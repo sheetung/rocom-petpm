@@ -165,13 +165,16 @@ function clearBreedSelection() {
   breedMatches.value = [];
 }
 
-async function refreshPets() {
+async function refreshPets(groupOverride = breedGroup.value) {
   loading.value = true;
   error.value = "";
+  clearBreedSelection();
+  exactPetName.value = "";
+  breedGroup.value = groupOverride;
   try {
     const params = new URLSearchParams();
     if (breedSearch.value.trim()) params.set("search", breedSearch.value.trim());
-    if (breedGroup.value.trim()) params.set("group", breedGroup.value.trim());
+    if (groupOverride.trim()) params.set("group", groupOverride.trim());
     const data = await fetchJson(`/api/pets?${params.toString()}`);
     pets.value = data.pets;
   } catch (err) {
@@ -181,6 +184,9 @@ async function refreshPets() {
   }
 }
 
+function selectBreedGroup(group) {
+  refreshPets(group);
+}
 async function searchMatches() {
   if (!exactPetName.value.trim()) {
     error.value = "请输入完整宠物名称。";
@@ -407,8 +413,8 @@ onMounted(() => {
       <main class="content-panel">
         <section v-if="view === 'breed'" class="panel panel-main">
           <div class="chip-row chip-row-top">
-            <button class="filter-chip" :class="{ active: breedGroup === '' }" @click="breedGroup = ''; refreshPets()">全部</button>
-            <button v-for="group in eggGroups" :key="`chip-${group}`" class="filter-chip" :class="{ active: breedGroup === group }" @click="breedGroup = group; refreshPets()">{{ group }}</button>
+            <button class="filter-chip" :class="{ active: breedGroup === '' }" @click="selectBreedGroup('')">全部</button>
+            <button v-for="group in eggGroups" :key="`chip-${group}`" class="filter-chip" :class="{ active: breedGroup === group }" @click="selectBreedGroup(group)">{{ group }}</button>
           </div>
 
           <div v-if="selectedPet" class="focus-card">
@@ -508,6 +514,7 @@ onMounted(() => {
     </datalist>
   </div>
 </template>
+
 
 
 
