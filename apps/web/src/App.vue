@@ -160,6 +160,11 @@ async function submitAuth() {
   }
 }
 
+function clearBreedSelection() {
+  selectedPet.value = null;
+  breedMatches.value = [];
+}
+
 async function refreshPets() {
   loading.value = true;
   error.value = "";
@@ -503,6 +508,7 @@ onMounted(() => {
     </datalist>
   </div>
 </template>
+
 
 
 
