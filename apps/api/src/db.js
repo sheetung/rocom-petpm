@@ -17,6 +17,11 @@ function loadSeedPets() {
   return JSON.parse(raw);
 }
 
+function hasColumn(db, tableName, columnName) {
+  const columns = db.prepare(`PRAGMA table_info(${tableName})`).all();
+  return columns.some((column) => column.name === columnName);
+}
+
 export function getDb() {
   ensureStorage();
   const db = new Database(dbPath);
@@ -44,16 +49,31 @@ export function initializeDatabase(db) {
       FOREIGN KEY (egg_group_id) REFERENCES egg_groups(id) ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_key TEXT NOT NULL UNIQUE,
+      contact_id TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS egg_requests (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
       wanted_pet TEXT NOT NULL,
       offered_pet TEXT,
       contact_id TEXT NOT NULL,
       note TEXT,
       status TEXT NOT NULL DEFAULT 'open',
-      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
   `);
+
+  if (!hasColumn(db, "egg_requests", "user_id")) {
+    db.exec("ALTER TABLE egg_requests ADD COLUMN user_id INTEGER");
+  }
+
+  backfillLegacyUsers(db);
 
   const petCount = db.prepare("SELECT COUNT(*) AS count FROM pets").get().count;
   if (petCount > 0) {
@@ -76,6 +96,35 @@ export function initializeDatabase(db) {
         insertEggGroup.run(group);
         const eggGroupId = selectEggGroup.get(group).id;
         insertJoin.run(petId, eggGroupId);
+      }
+    }
+  });
+
+  transaction();
+}
+
+function backfillLegacyUsers(db) {
+  const legacyRows = db.prepare(`
+    SELECT id, contact_id
+    FROM egg_requests
+    WHERE user_id IS NULL OR user_id = 0
+  `).all();
+
+  if (!legacyRows.length) {
+    return;
+  }
+
+  const insertUser = db.prepare("INSERT OR IGNORE INTO users (user_key, contact_id) VALUES (?, ?)");
+  const selectUser = db.prepare("SELECT id FROM users WHERE user_key = ?");
+  const updateRequest = db.prepare("UPDATE egg_requests SET user_id = ? WHERE id = ?");
+
+  const transaction = db.transaction(() => {
+    for (const row of legacyRows) {
+      const legacyKey = String(row.contact_id || `legacy-${row.id}`).trim();
+      insertUser.run(legacyKey, String(row.contact_id || legacyKey));
+      const userId = selectUser.get(legacyKey)?.id;
+      if (userId) {
+        updateRequest.run(userId, row.id);
       }
     }
   });
@@ -149,33 +198,75 @@ export function findPetMatches(db, petName) {
   return { pet, matches };
 }
 
-export function listRequests(db, { keyword = "", wantedPet = "" } = {}) {
-  let sql = "SELECT * FROM egg_requests WHERE status = 'open'";
+export function listRequests(db, { keyword = "", wantedPet = "", userKey = "" } = {}) {
+  let sql = `
+    SELECT er.*, u.user_key AS userKey, u.contact_id AS userContactId
+    FROM egg_requests er
+    LEFT JOIN users u ON u.id = er.user_id
+    WHERE er.status = 'open'
+  `;
   const params = [];
 
   if (keyword) {
-    sql += " AND (wanted_pet LIKE ? OR offered_pet LIKE ? OR contact_id LIKE ? OR note LIKE ?)";
+    sql += " AND (er.wanted_pet LIKE ? OR er.offered_pet LIKE ? OR er.contact_id LIKE ? OR er.note LIKE ? OR u.user_key LIKE ?)";
     const search = `%${keyword}%`;
-    params.push(search, search, search, search);
+    params.push(search, search, search, search, search);
   }
 
   if (wantedPet) {
-    sql += " AND wanted_pet = ?";
+    sql += " AND er.wanted_pet = ?";
     params.push(wantedPet);
   }
 
-  sql += " ORDER BY datetime(created_at) DESC, id DESC";
+  if (userKey) {
+    sql += " AND u.user_key = ?";
+    params.push(userKey);
+  }
+
+  sql += " ORDER BY datetime(er.created_at) DESC, er.id DESC";
   return db.prepare(sql).all(...params);
 }
 
+export function createOrGetUser(db, { userKey, contactId }) {
+  db.prepare(`
+    INSERT INTO users (user_key, contact_id)
+    VALUES (?, ?)
+    ON CONFLICT(user_key) DO UPDATE SET contact_id = excluded.contact_id
+  `).run(userKey, contactId);
+
+  return db.prepare("SELECT id, user_key, contact_id FROM users WHERE user_key = ?").get(userKey);
+}
+
 export function createRequest(db, payload) {
+  const user = createOrGetUser(db, {
+    userKey: payload.userKey,
+    contactId: payload.contactId
+  });
+
   return db.prepare(`
-    INSERT INTO egg_requests (wanted_pet, offered_pet, contact_id, note, status)
-    VALUES (?, ?, ?, ?, 'open')
+    INSERT INTO egg_requests (user_id, wanted_pet, offered_pet, contact_id, note, status)
+    VALUES (?, ?, ?, ?, ?, 'open')
   `).run(
+    user.id,
     payload.wantedPet,
     payload.offeredPet || null,
     payload.contactId,
     payload.note || null
   );
+}
+
+export function deleteRequest(db, { requestId, userKey }) {
+  const request = db.prepare(`
+    SELECT er.id
+    FROM egg_requests er
+    INNER JOIN users u ON u.id = er.user_id
+    WHERE er.id = ? AND u.user_key = ?
+  `).get(requestId, userKey);
+
+  if (!request) {
+    return { deleted: false };
+  }
+
+  db.prepare("DELETE FROM egg_requests WHERE id = ?").run(requestId);
+  return { deleted: true };
 }

@@ -5,6 +5,7 @@ const apiBase = import.meta.env.VITE_API_BASE_URL || "";
 const view = ref("breed");
 const loading = ref(false);
 const saving = ref(false);
+const deletingId = ref(null);
 const error = ref("");
 const success = ref("");
 
@@ -19,11 +20,13 @@ const breedGroup = ref("");
 const exactPetName = ref("");
 const requestKeyword = ref("");
 const requestWantedPet = ref("");
+const requestUserKey = ref("");
 
 const form = ref({
   wantedPet: "",
   offeredPet: "",
   contactId: "",
+  userKey: "",
   note: ""
 });
 
@@ -115,6 +118,7 @@ async function refreshRequests() {
     const params = new URLSearchParams();
     if (requestKeyword.value.trim()) params.set("keyword", requestKeyword.value.trim());
     if (requestWantedPet.value.trim()) params.set("wantedPet", requestWantedPet.value.trim());
+    if (requestUserKey.value.trim()) params.set("userKey", requestUserKey.value.trim());
     const data = await fetchJson(`/api/requests?${params.toString()}`);
     requests.value = data.requests;
   } catch (err) {
@@ -125,8 +129,8 @@ async function refreshRequests() {
 }
 
 async function createRequestCard() {
-  if (!form.value.wantedPet.trim() || !form.value.contactId.trim()) {
-    error.value = "想要的宠物蛋和联系 ID 为必填。";
+  if (!form.value.wantedPet.trim() || !form.value.contactId.trim() || !form.value.userKey.trim()) {
+    error.value = "想要的宠物蛋、联系 ID 和用户字段为必填。";
     return;
   }
 
@@ -140,16 +144,43 @@ async function createRequestCard() {
         wantedPet: form.value.wantedPet.trim(),
         offeredPet: form.value.offeredPet.trim(),
         contactId: form.value.contactId.trim(),
+        userKey: form.value.userKey.trim(),
         note: form.value.note.trim()
       })
     });
     success.value = "求蛋卡片已发布。";
-    form.value = { wantedPet: "", offeredPet: "", contactId: "", note: "" };
+    form.value = { wantedPet: "", offeredPet: "", contactId: "", userKey: "", note: "" };
     await refreshRequests();
   } catch (err) {
     error.value = err.message;
   } finally {
     saving.value = false;
+  }
+}
+
+async function removeRequest(card) {
+  const inputKey = window.prompt(`删除卡片需要输入用户字段。\n请为 ${card.wanted_pet} 输入你的用户字段：`, requestUserKey.value || card.userKey || "");
+  if (!inputKey) {
+    return;
+  }
+
+  deletingId.value = card.id;
+  error.value = "";
+  success.value = "";
+  try {
+    await fetchJson(`/api/requests/${card.id}`, {
+      method: "DELETE",
+      body: JSON.stringify({ userKey: inputKey.trim() })
+    });
+    success.value = "卡片已删除。";
+    if (!requestUserKey.value.trim()) {
+      requestUserKey.value = inputKey.trim();
+    }
+    await refreshRequests();
+  } catch (err) {
+    error.value = err.message;
+  } finally {
+    deletingId.value = null;
   }
 }
 
@@ -161,7 +192,6 @@ onMounted(loadInitial);
     <div class="hero">
       <p class="eyebrow">Rocom Petplus Node</p>
       <h1>洛克王国蛋组查询与求蛋广场</h1>
-      <p class="hero-text">基于 Vue + Node + SQLite，适合部署到 1Panel。前端负责体验，后端负责真实存储与检索。</p>
       <div class="segmented-tabs" role="tablist" aria-label="功能切换">
         <button class="segmented-tab" :class="{ active: view === 'breed' }" @click="view = 'breed'">蛋组查询</button>
         <button class="segmented-tab" :class="{ active: view === 'board' }" @click="view = 'board'">求蛋广场</button>
@@ -242,7 +272,7 @@ onMounted(loadInitial);
     <section v-else class="panel">
       <div class="panel-head">
         <h2>求蛋广场</h2>
-        <p>支持用户发布想要的宠物蛋、可提供内容和联系 ID，后端会把数据存到 SQLite。</p>
+        <p>卡片归属到用户表，支持按用户字段查询，也支持用同一个用户字段删除自己的卡片。</p>
       </div>
 
       <div class="publish-grid">
@@ -258,6 +288,10 @@ onMounted(loadInitial);
           <label>联系 ID</label>
           <input v-model="form.contactId" type="text" placeholder="必填" />
         </div>
+        <div class="field">
+          <label>用户字段</label>
+          <input v-model="form.userKey" type="text" placeholder="必填，用于查询和删除自己的卡片" />
+        </div>
         <div class="field field-full">
           <label>补充说明</label>
           <textarea v-model="form.note" rows="3" placeholder="选填"></textarea>
@@ -265,14 +299,18 @@ onMounted(loadInitial);
         <button class="primary-btn" :disabled="saving" @click="createRequestCard">{{ saving ? '发布中...' : '发布求蛋卡片' }}</button>
       </div>
 
-      <div class="toolbar toolbar-secondary">
+      <div class="toolbar toolbar-board">
         <div class="field grow">
           <label>广场关键词</label>
-          <input v-model="requestKeyword" type="text" placeholder="搜宠物、提供内容、ID" />
+          <input v-model="requestKeyword" type="text" placeholder="搜宠物、提供内容、ID、用户字段" />
         </div>
         <div class="field">
           <label>按想要的蛋筛选</label>
           <input v-model="requestWantedPet" list="pet-names" type="text" placeholder="选填" />
+        </div>
+        <div class="field">
+          <label>按用户字段筛选</label>
+          <input v-model="requestUserKey" type="text" placeholder="输入自己的用户字段" />
         </div>
         <button class="primary-btn" @click="refreshRequests">检索广场</button>
       </div>
@@ -291,10 +329,17 @@ onMounted(loadInitial);
             </div>
             <div>
               <dt>联系 ID</dt>
-              <dd>{{ card.contact_id }}</dd>
+              <dd>{{ card.userContactId || card.contact_id }}</dd>
+            </div>
+            <div>
+              <dt>用户字段</dt>
+              <dd>{{ card.userKey || '未绑定' }}</dd>
             </div>
           </dl>
           <p v-if="card.note" class="request-note">{{ card.note }}</p>
+          <button class="ghost-btn danger-btn" :disabled="deletingId === card.id" @click="removeRequest(card)">
+            {{ deletingId === card.id ? '删除中...' : '删除这张卡片' }}
+          </button>
         </article>
       </div>
     </section>

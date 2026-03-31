@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   createRequest,
+  deleteRequest,
   findPetMatches,
   getDb,
   initializeDatabase,
@@ -43,23 +44,42 @@ app.get("/api/breed/matches", async (request) => {
   return findPetMatches(db, String(petName || "").trim());
 });
 app.get("/api/requests", async (request) => {
-  const { keyword = "", wantedPet = "" } = request.query;
-  return { requests: listRequests(db, { keyword, wantedPet }) };
+  const { keyword = "", wantedPet = "", userKey = "" } = request.query;
+  return { requests: listRequests(db, { keyword, wantedPet, userKey }) };
 });
 app.post("/api/requests", async (request, reply) => {
   const body = request.body || {};
   const wantedPet = String(body.wantedPet || "").trim();
   const offeredPet = String(body.offeredPet || "").trim();
   const contactId = String(body.contactId || "").trim();
+  const userKey = String(body.userKey || "").trim();
   const note = String(body.note || "").trim();
 
-  if (!wantedPet || !contactId) {
+  if (!wantedPet || !contactId || !userKey) {
     reply.code(400);
-    return { message: "wantedPet and contactId are required" };
+    return { message: "wantedPet, contactId and userKey are required" };
   }
 
-  createRequest(db, { wantedPet, offeredPet, contactId, note });
+  createRequest(db, { wantedPet, offeredPet, contactId, userKey, note });
   reply.code(201);
+  return { ok: true };
+});
+app.delete("/api/requests/:id", async (request, reply) => {
+  const requestId = Number(request.params.id);
+  const body = request.body || {};
+  const userKey = String(body.userKey || "").trim();
+
+  if (!requestId || !userKey) {
+    reply.code(400);
+    return { message: "request id and userKey are required" };
+  }
+
+  const result = deleteRequest(db, { requestId, userKey });
+  if (!result.deleted) {
+    reply.code(404);
+    return { message: "request not found or userKey mismatch" };
+  }
+
   return { ok: true };
 });
 
