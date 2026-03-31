@@ -426,7 +426,7 @@ onMounted(() => {
             </article>
           </div>
 
-          <div class="card-grid wide-grid">
+          <div v-else class="card-grid wide-grid">
             <article v-for="pet in filteredPets" :key="pet.id" class="pet-card clickable-card" @click="pickPet(pet)">
               <div class="pet-thumb">
                 <img :src="imageUrl(pet.name)" :alt="pet.name" @error="$event.target.style.visibility = 'hidden'" />
@@ -503,6 +503,7 @@ onMounted(() => {
     </datalist>
   </div>
 </template>
+
 
 
 
