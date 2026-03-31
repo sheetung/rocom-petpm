@@ -49,7 +49,7 @@ const isUserReady = computed(() => Boolean(userProfile.value.token && userProfil
 const currentViewTitle = computed(() => (view.value === "breed" ? "蛋组查询" : "求蛋广场"));
 const currentViewDescription = computed(() =>
   view.value === "breed"
-    ? "筛选宠物、查可配对对象，继续保留原来的核心查询体验。"
+    ? "蛋随母系，部分宠物属于多个蛋组，因此会在多个组别下被查询到。"
     : "卡片归属到登录用户，支持按用户名查询，并通过完成求蛋保留历史记录。"
 );
 
@@ -537,6 +537,7 @@ onMounted(() => {
     </datalist>
   </div>
 </template>
+
 
 
 
