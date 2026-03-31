@@ -1,4 +1,4 @@
-<script setup>
+ï»¿<script setup>
 import { computed, onMounted, ref, watch } from "vue";
 
 const apiBase = import.meta.env.VITE_API_BASE_URL || "";
@@ -45,11 +45,11 @@ const form = ref({
 
 const filteredPets = computed(() => pets.value);
 const isUserReady = computed(() => Boolean(userProfile.value.token && userProfile.value.username));
-const currentViewTitle = computed(() => (view.value === "breed" ? "µ°×é²éÑ¯" : "Çóµ°¹ã³¡"));
+const currentViewTitle = computed(() => (view.value === "breed" ? "ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¯" : "ï¿½óµ°¹ã³¡"));
 const currentViewDescription = computed(() =>
   view.value === "breed"
-    ? "É¸Ñ¡³èÎï¡¢²é¿ÉÅä¶Ô¶ÔÏó£¬¼ÌÐø±£ÁôÔ­À´µÄºËÐÄ²éÑ¯ÌåÑé¡£"
-    : "¿¨Æ¬¹éÊôµ½µÇÂ¼ÓÃ»§£¬Ö§³Ö°´ÓÃ»§Ãû²éÑ¯£¬²¢Í¨¹ýÍê³ÉÇóµ°±£ÁôÀúÊ·¼ÇÂ¼¡£"
+    ? "É¸Ñ¡ï¿½ï¿½ï¿½ï¡¢ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ó£¬¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½ï¿½Äºï¿½ï¿½Ä²ï¿½Ñ¯ï¿½ï¿½ï¿½é¡£"
+    : "ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½Ã»ï¿½ï¿½ï¿½Ö§ï¿½Ö°ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½óµ°±ï¿½ï¿½ï¿½ï¿½ï¿½Ê·ï¿½ï¿½Â¼ï¿½ï¿½"
 );
 
 function imageUrl(petName) {
@@ -84,7 +84,7 @@ function logout() {
   userProfile.value = { token: "", username: "", contactId: "" };
   window.localStorage.removeItem("rocom-auth-profile");
   requestUsername.value = "";
-  success.value = "ÒÑÍË³öµ±Ç°µÇÂ¼¡£";
+  success.value = "ï¿½ï¿½ï¿½Ë³ï¿½ï¿½ï¿½Ç°ï¿½ï¿½Â¼ï¿½ï¿½";
 }
 
 async function fetchJson(path, options = {}) {
@@ -133,11 +133,11 @@ async function loadInitial() {
 
 async function submitAuth() {
   if (!authForm.value.username.trim() || !authForm.value.password.trim()) {
-    error.value = "ÓÃ»§ÃûºÍÃÜÂëÎª±ØÌî¡£";
+    error.value = "ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½î¡£";
     return;
   }
   if (authMode.value === "register" && !authForm.value.contactId.trim()) {
-    error.value = "×¢²áÊ±ÐèÒªÌîÐ´ÁªÏµ ID¡£";
+    error.value = "×¢ï¿½ï¿½Ê±ï¿½ï¿½Òªï¿½ï¿½Ð´ï¿½ï¿½Ïµ IDï¿½ï¿½";
     return;
   }
 
@@ -156,7 +156,7 @@ async function submitAuth() {
     persistUserProfile(data);
     authForm.value.password = "";
     showUserModal.value = false;
-    success.value = authMode.value === "login" ? "µÇÂ¼³É¹¦¡£" : "×¢²á²¢µÇÂ¼³É¹¦¡£";
+    success.value = authMode.value === "login" ? "ï¿½ï¿½Â¼ï¿½É¹ï¿½ï¿½ï¿½" : "×¢ï¿½á²¢ï¿½ï¿½Â¼ï¿½É¹ï¿½ï¿½ï¿½";
     await refreshRequests();
   } catch (err) {
     error.value = err.message;
@@ -181,7 +181,7 @@ async function refreshPets() {
 
 async function searchMatches() {
   if (!exactPetName.value.trim()) {
-    error.value = "ÇëÊäÈëÍêÕû³èÎïÃû³Æ¡£";
+    error.value = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¡ï¿½";
     return;
   }
 
@@ -192,7 +192,7 @@ async function searchMatches() {
     selectedPet.value = data.pet;
     breedMatches.value = data.matches;
     if (!data.pet) {
-      error.value = "Ã»ÓÐÕÒµ½Õâ¸ö³èÎï¡£";
+      error.value = "Ã»ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¡£";
     }
   } catch (err) {
     error.value = err.message;
@@ -225,12 +225,12 @@ async function refreshRequests() {
 
 async function createRequestCard() {
   if (!isUserReady.value) {
-    error.value = "ÇëÏÈµÇÂ¼£¬ÔÙ·¢²¼¿¨Æ¬¡£";
+    error.value = "ï¿½ï¿½ï¿½Èµï¿½Â¼ï¿½ï¿½ï¿½Ù·ï¿½ï¿½ï¿½ï¿½ï¿½Æ¬ï¿½ï¿½";
     showUserModal.value = true;
     return;
   }
   if (!form.value.wantedPet.trim()) {
-    error.value = "ÏëÒªµÄ³èÎïµ°Îª±ØÌî¡£";
+    error.value = "ï¿½ï¿½Òªï¿½Ä³ï¿½ï¿½ïµ°Îªï¿½ï¿½ï¿½î¡£";
     return;
   }
 
@@ -246,7 +246,7 @@ async function createRequestCard() {
         note: form.value.note.trim()
       })
     });
-    success.value = "Çóµ°¿¨Æ¬ÒÑ·¢²¼¡£";
+    success.value = "ï¿½óµ°¿ï¿½Æ¬ï¿½Ñ·ï¿½ï¿½ï¿½ï¿½ï¿½";
     form.value = { wantedPet: "", offeredPet: "", note: "" };
     requestUsername.value = userProfile.value.username;
     await refreshRequests();
@@ -259,7 +259,7 @@ async function createRequestCard() {
 
 async function completeRequestCard(card) {
   if (!isUserReady.value) {
-    error.value = "ÇëÏÈµÇÂ¼¡£";
+    error.value = "ï¿½ï¿½ï¿½Èµï¿½Â¼ï¿½ï¿½";
     showUserModal.value = true;
     return;
   }
@@ -271,7 +271,7 @@ async function completeRequestCard(card) {
     await fetchJson(`/api/requests/${card.id}/complete`, {
       method: "PATCH"
     });
-    success.value = "¸Ã¿¨Æ¬ÒÑ±ê¼ÇÎªÍê³ÉÇóµ°¡£";
+    success.value = "ï¿½Ã¿ï¿½Æ¬ï¿½Ñ±ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½óµ°¡ï¿½";
     requestUsername.value = userProfile.value.username;
     await refreshRequests();
   } catch (err) {
@@ -296,116 +296,116 @@ onMounted(() => {
   <div class="page-shell">
     <div class="hero hero-compact">
       <p class="eyebrow">Rocom Petplus Node</p>
-      <h1>Âå¿ËÍõ¹úµ°×é²éÑ¯ÓëÇóµ°¹ã³¡</h1>
+      <h1>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½óµ°¹ã³¡</h1>
     </div>
 
     <p v-if="error" class="banner banner-error">{{ error }}</p>
     <p v-if="success" class="banner banner-success">{{ success }}</p>
-    <p v-if="loading" class="banner">ÕýÔÚ¼ÓÔØÊý¾Ý...</p>
+    <p v-if="loading" class="banner">ï¿½ï¿½ï¿½Ú¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½...</p>
 
     <div class="workspace-grid">
       <aside class="side-panel">
         <section class="side-card">
-          <p class="side-label">µ±Ç°Ä£Ê½</p>
+          <p class="side-label">ï¿½ï¿½Ç°Ä£Ê½</p>
           <h2>{{ currentViewTitle }}</h2>
           <p class="side-copy">{{ currentViewDescription }}</p>
-          <div class="segmented-tabs stacked-tabs" role="tablist" aria-label="¹¦ÄÜÇÐ»»">
-            <button class="segmented-tab" :class="{ active: view === 'breed' }" @click="view = 'breed'">µ°×é²éÑ¯</button>
-            <button class="segmented-tab" :class="{ active: view === 'board' }" @click="view = 'board'">Çóµ°¹ã³¡</button>
+          <div class="segmented-tabs stacked-tabs" role="tablist" aria-label="ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½">
+            <button class="segmented-tab" :class="{ active: view === 'breed' }" @click="view = 'breed'">ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¯</button>
+            <button class="segmented-tab" :class="{ active: view === 'board' }" @click="view = 'board'">ï¿½óµ°¹ã³¡</button>
           </div>
         </section>
 
         <section class="side-card user-card">
           <div class="side-head">
             <div>
-              <p class="side-label">ÓÃ»§µÇÂ¼</p>
-              <h3>{{ isUserReady ? userProfile.username : 'Î´µÇÂ¼' }}</h3>
+              <p class="side-label">ï¿½Ã»ï¿½ï¿½ï¿½Â¼</p>
+              <h3>{{ isUserReady ? userProfile.username : 'Î´ï¿½ï¿½Â¼' }}</h3>
             </div>
             <div class="user-actions">
-              <button class="ghost-btn" @click="showUserModal = true">{{ isUserReady ? 'ÇÐ»»ÕËºÅ' : 'µÇÂ¼ / ×¢²á' }}</button>
-              <button v-if="isUserReady" class="ghost-btn" @click="logout">ÍË³ö</button>
+              <button class="ghost-btn" @click="showUserModal = true">{{ isUserReady ? 'ï¿½Ð»ï¿½ï¿½Ëºï¿½' : 'ï¿½ï¿½Â¼ / ×¢ï¿½ï¿½' }}</button>
+              <button v-if="isUserReady" class="ghost-btn" @click="logout">ï¿½Ë³ï¿½</button>
             </div>
           </div>
-          <p class="side-copy small-copy">µÇÂ¼ºó¿É·¢²¼×Ô¼ºµÄ¿¨Æ¬¡¢²éÑ¯×Ô¼ºµÄ¼ÇÂ¼£¬²¢½«¿¨Æ¬±ê¼ÇÎªÍê³ÉÇóµ°¡£</p>
+          <p class="side-copy small-copy">ï¿½ï¿½Â¼ï¿½ï¿½É·ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½Ä¿ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½Ñ¯ï¿½Ô¼ï¿½ï¿½Ä¼ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½óµ°¡ï¿½</p>
           <dl v-if="isUserReady" class="user-meta">
             <div>
-              <dt>ÓÃ»§Ãû</dt>
+              <dt>ï¿½Ã»ï¿½ï¿½ï¿½</dt>
               <dd>{{ userProfile.username }}</dd>
             </div>
             <div>
-              <dt>ÁªÏµ ID</dt>
+              <dt>ï¿½ï¿½Ïµ ID</dt>
               <dd>{{ userProfile.contactId }}</dd>
             </div>
           </dl>
         </section>
 
         <section v-if="view === 'breed'" class="side-card">
-          <p class="side-label">²éÑ¯²Ù×÷</p>
+          <p class="side-label">ï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½ï¿½</p>
           <div class="field">
-            <label>Ãû³ÆÄ£ºýËÑË÷</label>
-            <input v-model="breedSearch" type="text" placeholder="ÊäÈë³èÎïÃû³ÆÆ¬¶Î" />
+            <label>ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</label>
+            <input v-model="breedSearch" type="text" placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¬ï¿½ï¿½" />
           </div>
           <div class="field">
-            <label>µ°×éÉ¸Ñ¡</label>
+            <label>ï¿½ï¿½ï¿½ï¿½É¸Ñ¡</label>
             <select v-model="breedGroup">
-              <option value="">È«²¿</option>
+              <option value="">È«ï¿½ï¿½</option>
               <option v-for="group in eggGroups" :key="group" :value="group">{{ group }}</option>
             </select>
           </div>
-          <button class="primary-btn full-btn" @click="refreshPets">¸üÐÂÁÐ±í</button>
+          <button class="primary-btn full-btn" @click="refreshPets">ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½</button>
           <div class="field">
-            <label>¾«È·²éÑ¯Åä¶Ô</label>
-            <input v-model="exactPetName" list="pet-names" type="text" placeholder="ÊäÈëÍêÕû³èÎïÃû³Æ" />
+            <label>ï¿½ï¿½È·ï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½</label>
+            <input v-model="exactPetName" list="pet-names" type="text" placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" />
           </div>
-          <button class="primary-btn full-btn" @click="searchMatches">²éÑ¯Åä¶Ô</button>
-          <p class="panel-tip no-margin">ÓÒ²à¿¨Æ¬Ö§³ÖÖ±½Óµã»÷£¬µãÒ»ÏÂ¾Í»á×Ô¶¯²éÑ¯ÕâÖ»³èÎïµÄÅä¶Ô½á¹û¡£</p>
+          <button class="primary-btn full-btn" @click="searchMatches">ï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½</button>
+          <p class="panel-tip no-margin">ï¿½Ò²à¿¨Æ¬Ö§ï¿½ï¿½Ö±ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Â¾Í»ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½Ñ¯ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô½ï¿½ï¿½ï¿½ï¿½</p>
         </section>
 
         <section v-else class="side-card">
-          <p class="side-label">·¢²¼Çóµ°</p>
+          <p class="side-label">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</p>
           <div class="field">
-            <label>ÏëÒªµÄ³èÎïµ°</label>
-            <input v-model="form.wantedPet" list="pet-names" type="text" placeholder="±ØÌî" />
+            <label>ï¿½ï¿½Òªï¿½Ä³ï¿½ï¿½ïµ°</label>
+            <input v-model="form.wantedPet" list="pet-names" type="text" placeholder="ï¿½ï¿½ï¿½ï¿½" />
           </div>
           <div class="field">
-            <label>¿ÉÌá¹©µÄ³èÎï</label>
-            <input v-model="form.offeredPet" list="pet-names" type="text" placeholder="Ñ¡Ìî" />
+            <label>ï¿½ï¿½ï¿½á¹©ï¿½Ä³ï¿½ï¿½ï¿½</label>
+            <input v-model="form.offeredPet" list="pet-names" type="text" placeholder="Ñ¡ï¿½ï¿½" />
           </div>
           <div class="field">
-            <label>²¹³äËµÃ÷</label>
-            <textarea v-model="form.note" rows="4" placeholder="Ñ¡Ìî"></textarea>
+            <label>ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½</label>
+            <textarea v-model="form.note" rows="4" placeholder="Ñ¡ï¿½ï¿½"></textarea>
           </div>
-          <button class="primary-btn full-btn" :disabled="saving" @click="createRequestCard">{{ saving ? '·¢²¼ÖÐ...' : '·¢²¼Çóµ°¿¨Æ¬' }}</button>
+          <button class="primary-btn full-btn" :disabled="saving" @click="createRequestCard">{{ saving ? 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½...' : 'ï¿½ï¿½ï¿½ï¿½ï¿½óµ°¿ï¿½Æ¬' }}</button>
 
-          <p class="side-label top-gap">¹ã³¡É¸Ñ¡</p>
+          <p class="side-label top-gap">ï¿½ã³¡É¸Ñ¡</p>
           <div class="field">
-            <label>¹Ø¼ü´Ê</label>
-            <input v-model="requestKeyword" type="text" placeholder="ËÑ³èÎï¡¢ID¡¢ÓÃ»§Ãû" />
+            <label>ï¿½Ø¼ï¿½ï¿½ï¿½</label>
+            <input v-model="requestKeyword" type="text" placeholder="ï¿½Ñ³ï¿½ï¿½ï¡¢IDï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½" />
           </div>
           <div class="field">
-            <label>ÏëÒªµÄµ°</label>
-            <input v-model="requestWantedPet" list="pet-names" type="text" placeholder="Ñ¡Ìî" />
+            <label>ï¿½ï¿½Òªï¿½Äµï¿½</label>
+            <input v-model="requestWantedPet" list="pet-names" type="text" placeholder="Ñ¡ï¿½ï¿½" />
           </div>
           <div class="field">
-            <label>ÓÃ»§Ãû</label>
-            <input v-model="requestUsername" type="text" placeholder="²é×Ô¼ºµÄ¿¨Æ¬" />
+            <label>ï¿½Ã»ï¿½ï¿½ï¿½</label>
+            <input v-model="requestUsername" type="text" placeholder="ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½Ä¿ï¿½Æ¬" />
           </div>
           <div class="field">
             <label>×´Ì¬</label>
             <select v-model="requestStatus">
-              <option value="open">Çóµ°ÖÐ</option>
-              <option value="completed">ÒÑÍê³É</option>
-              <option value="all">È«²¿</option>
+              <option value="open">ï¿½ï¿½ï¿½ï¿½</option>
+              <option value="completed">ï¿½ï¿½ï¿½ï¿½ï¿½</option>
+              <option value="all">È«ï¿½ï¿½</option>
             </select>
           </div>
-          <button class="primary-btn full-btn" @click="refreshRequests">¼ìË÷¹ã³¡</button>
+          <button class="primary-btn full-btn" @click="refreshRequests">ï¿½ï¿½ï¿½ï¿½ï¿½ã³¡</button>
         </section>
       </aside>
 
       <main class="content-panel">
         <section v-if="view === 'breed'" class="panel panel-main">
           <div class="chip-row chip-row-top">
-            <button class="filter-chip" :class="{ active: breedGroup === '' }" @click="breedGroup = ''; refreshPets()">È«²¿</button>
+            <button class="filter-chip" :class="{ active: breedGroup === '' }" @click="breedGroup = ''; refreshPets()">È«ï¿½ï¿½</button>
             <button v-for="group in eggGroups" :key="`chip-${group}`" class="filter-chip" :class="{ active: breedGroup === group }" @click="breedGroup = group; refreshPets()">{{ group }}</button>
           </div>
 
@@ -445,26 +445,26 @@ onMounted(() => {
           <div class="board-grid wide-board-grid">
             <article v-for="card in requests" :key="card.id" class="request-card">
               <div class="request-top">
-                <span class="badge" :class="{ 'badge-muted': card.status === 'completed' }">{{ card.status === 'completed' ? 'ÒÑÍê³É' : 'Çóµ°ÖÐ' }}</span>
+                <span class="badge" :class="{ 'badge-muted': card.status === 'completed' }">{{ card.status === 'completed' ? 'ï¿½ï¿½ï¿½ï¿½ï¿½' : 'ï¿½ï¿½ï¿½ï¿½' }}</span>
                 <time>{{ card.completed_at || card.created_at }}</time>
               </div>
               <h3>{{ card.wanted_pet }}</h3>
               <dl class="request-meta">
                 <div>
-                  <dt>¿ÉÌá¹©</dt>
-                  <dd>{{ card.offered_pet || 'ÔÝÎ´ÌîÐ´' }}</dd>
+                  <dt>ï¿½ï¿½ï¿½á¹©</dt>
+                  <dd>{{ card.offered_pet || 'ï¿½ï¿½Î´ï¿½ï¿½Ð´' }}</dd>
                 </div>
                 <div>
-                  <dt>ÁªÏµ ID</dt>
+                  <dt>ï¿½ï¿½Ïµ ID</dt>
                   <dd>{{ card.userContactId || card.contact_id }}</dd>
                 </div>
                 <div>
-                  <dt>²¹³äËµÃ÷</dt>
-                  <dd class="request-note-value">{{ card.note || 'ÔÝÎ´ÌîÐ´' }}</dd>
+                  <dt>ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½</dt>
+                  <dd class="request-note-value">{{ card.note || 'ï¿½ï¿½Î´ï¿½ï¿½Ð´' }}</dd>
                 </div>
               </dl>
               <button v-if="card.status === 'open' && isUserReady && card.username === userProfile.username" class="ghost-btn danger-btn" :disabled="completingId === card.id" @click="completeRequestCard(card)">
-                {{ completingId === card.id ? '´¦ÀíÖÐ...' : 'Íê³ÉÇóµ°' }}
+                {{ completingId === card.id ? 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½...' : 'ï¿½ï¿½ï¿½ï¿½ï¿½' }}
               </button>
             </article>
           </div>
@@ -476,28 +476,28 @@ onMounted(() => {
       <div class="modal-card">
         <div class="modal-head">
           <div>
-            <p class="side-label">ÓÃ»§µÇÂ¼</p>
-            <h3>{{ authMode === 'login' ? 'µÇÂ¼ÕËºÅ' : '×¢²áÕËºÅ' }}</h3>
+            <p class="side-label">ï¿½Ã»ï¿½ï¿½ï¿½Â¼</p>
+            <h3>{{ authMode === 'login' ? 'ï¿½ï¿½Â¼ï¿½Ëºï¿½' : '×¢ï¿½ï¿½ï¿½Ëºï¿½' }}</h3>
           </div>
-          <button class="ghost-btn" @click="showUserModal = false">¹Ø±Õ</button>
+          <button class="ghost-btn" @click="showUserModal = false">ï¿½Ø±ï¿½</button>
         </div>
         <div class="auth-switch">
-          <button class="filter-chip" :class="{ active: authMode === 'login' }" @click="authMode = 'login'">µÇÂ¼</button>
-          <button class="filter-chip" :class="{ active: authMode === 'register' }" @click="authMode = 'register'">×¢²á</button>
+          <button class="filter-chip" :class="{ active: authMode === 'login' }" @click="authMode = 'login'">ï¿½ï¿½Â¼</button>
+          <button class="filter-chip" :class="{ active: authMode === 'register' }" @click="authMode = 'register'">×¢ï¿½ï¿½</button>
         </div>
         <div class="field">
-          <label>ÓÃ»§Ãû</label>
-          <input v-model="authForm.username" type="text" placeholder="Î¨Ò»ÓÃ»§Ãû" />
+          <label>ï¿½Ã»ï¿½ï¿½ï¿½</label>
+          <input v-model="authForm.username" type="text" placeholder="Î¨Ò»ï¿½Ã»ï¿½ï¿½ï¿½" />
         </div>
         <div class="field">
-          <label>ÃÜÂë</label>
-          <input v-model="authForm.password" type="password" placeholder="ÊäÈëÃÜÂë" />
+          <label>ï¿½ï¿½ï¿½ï¿½</label>
+          <input v-model="authForm.password" type="password" placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" />
         </div>
         <div v-if="authMode === 'register'" class="field">
-          <label>ÁªÏµ ID</label>
-          <input v-model="authForm.contactId" type="text" placeholder="QQ / Î¢ÐÅ / ÓÎÏ· ID" />
+          <label>ï¿½ï¿½Ïµ ID</label>
+          <input v-model="authForm.contactId" type="text" placeholder="QQ / Î¢ï¿½ï¿½ / ï¿½ï¿½Ï· ID" />
         </div>
-        <button class="primary-btn full-btn" @click="submitAuth">{{ authMode === 'login' ? 'µÇÂ¼²¢Ê¹ÓÃ' : '×¢²á²¢µÇÂ¼' }}</button>
+        <button class="primary-btn full-btn" @click="submitAuth">{{ authMode === 'login' ? 'ï¿½ï¿½Â¼ï¿½ï¿½Ê¹ï¿½ï¿½' : '×¢ï¿½á²¢ï¿½ï¿½Â¼' }}</button>
       </div>
     </div>
 
