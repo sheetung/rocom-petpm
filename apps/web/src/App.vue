@@ -375,11 +375,8 @@ onMounted(() => {
         </section>
 
         <section v-else class="side-card">
-          <p class="side-label">发布求蛋</p>
-          <p class="side-copy small-copy">发布入口改成弹出卡片，左侧只保留一个操作按钮。</p>
-          <button class="primary-btn full-btn" @click="showRequestModal = true">发布求蛋卡片</button>
+          <p class="side-label">广场筛选</p>
 
-          <p class="side-label top-gap">广场筛选</p>
           <div class="field">
             <label>关键词</label>
             <input v-model="requestKeyword" type="text" placeholder="搜宠物、ID、用户名" />
@@ -443,6 +440,14 @@ onMounted(() => {
         </section>
 
         <section v-else class="panel panel-main">
+          <div class="panel-head panel-head-row">
+            <div>
+              <p class="side-label">求蛋广场</p>
+              <h2>求蛋广场</h2>
+              <p class="panel-tip">浏览卡片、检索记录，需要时再打开发布弹窗。</p>
+            </div>
+            <button class="primary-btn" @click="showRequestModal = true">发布求蛋卡片</button>
+          </div>
           <div class="board-grid wide-board-grid">
             <article v-for="card in requests" :key="card.id" class="request-card">
               <div class="request-top">

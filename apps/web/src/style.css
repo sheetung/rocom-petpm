@@ -56,6 +56,9 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .segmented-tab.active { color: #fff; background: linear-gradient(135deg, #ef7f8c, #ffab7f); box-shadow: 0 10px 24px rgba(239, 127, 140, .26); }
 .segmented-tab:hover { background: rgba(255,255,255,.45); }
 .panel-main { min-height: 70vh; }
+.panel-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+.panel-head-row h2 { margin: 0 0 8px; }
+.panel-head-row .panel-tip { max-width: 640px; }
 .field { display: flex; flex-direction: column; gap: 8px; }
 .field label { font-size: 13px; font-weight: 700; color: #5d5267; }
 .field input, .field textarea, .field select { width: 100%; padding: 13px 14px; border: 1px solid #eadfd1; border-radius: 16px; background: #fffefc; }
@@ -105,6 +108,9 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .workspace-grid { grid-template-columns: 1fr; }
   .side-panel { position: static; }
 }
+@media (max-width: 900px) {
+  .panel-head-row { flex-direction: column; }
+}
 @media (max-width: 760px) {
   .page-shell { padding: 14px; }
   .hero, .side-card, .panel, .modal-card { padding: 18px; border-radius: 24px; }
@@ -112,4 +118,5 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .focus-image { width: 120px; }
   .user-actions { justify-content: flex-start; }
 }
+
 
