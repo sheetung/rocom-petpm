@@ -325,7 +325,7 @@ onMounted(() => {
       </span>
       <span>
         遵循开源协议
-        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank" rel="noreferrer">CC BY-NC-SA 4.0（署名-非商业性使用-相同方式共享）</a>
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank" rel="noreferrer">CC BY-NC-SA 4.0</a>
       </span>
       </div>
       <a v-if="feedbackEmail" class="feedback-mail" :href="`mailto:${feedbackEmail}`">问题邮箱</a>
