@@ -15,14 +15,20 @@ const showRequestModal = ref(false);
 const authMode = ref("login");
 
 const eggGroups = ref([]);
+const allPets = ref([]);
 const pets = ref([]);
 const breedMatches = ref([]);
 const selectedPet = ref(null);
+const inheritSelectedPet = ref(null);
+const inheritResults = ref([]);
 const requests = ref([]);
 
 const breedSearch = ref("");
 const breedGroup = ref("");
 const exactPetName = ref("");
+const inheritSearch = ref("");
+const inheritGroup = ref("");
+const inheritPetName = ref("");
 const requestKeyword = ref("");
 const requestWantedPet = ref("");
 const requestUsername = ref("");
@@ -47,16 +53,35 @@ const form = ref({
 });
 
 const filteredPets = computed(() => pets.value);
-const isUserReady = computed(() => Boolean(userProfile.value.token && userProfile.value.username));
-const currentViewTitle = computed(() => (view.value === "breed" ? "蛋组查询" : "求蛋广场"));
-const currentViewDescription = computed(() =>
-  view.value === "breed"
-    ? "蛋随母系，部分宠物属于多个蛋组，因此会在多个组别下被查询到。"
-    : "卡片归属到登录用户，支持按用户名查询，并通过完成求蛋保留历史记录。"
+const inheritFilteredPets = computed(() =>
+  allPets.value.filter((pet) => {
+    const matchesSearch = !inheritSearch.value.trim() || pet.name.includes(inheritSearch.value.trim());
+    const matchesGroup = !inheritGroup.value.trim() || pet.groups.includes(inheritGroup.value.trim());
+    return matchesSearch && matchesGroup;
+  })
 );
+const isUserReady = computed(() => Boolean(userProfile.value.token && userProfile.value.username));
+const currentViewTitle = computed(() => {
+  if (view.value === "breed") return "蛋组查询";
+  if (view.value === "inherit") return "炫彩继承";
+  return "求蛋广场";
+});
+const currentViewDescription = computed(() => {
+  if (view.value === "breed") {
+    return "蛋随母系，部分宠物属于多个蛋组，因此会在多个组别下被查询到。";
+  }
+  if (view.value === "inherit") {
+    return "选择带有异色或炫彩的起点精灵，按同组传递链推导最终可继承到哪些精灵。";
+  }
+  return "卡片归属到登录用户，支持按用户名查询，并通过完成求蛋保留历史记录。";
+});
 
 function imageUrl(petName) {
   return `/pet-img/${petName}.png`;
+}
+
+function shareEggGroup(leftPet, rightPet) {
+  return leftPet.groups.some((group) => rightPet.groups.includes(group));
 }
 
 function loadUserProfile() {
@@ -118,6 +143,7 @@ async function loadInitial() {
       fetchJson("/api/requests")
     ]);
     eggGroups.value = groupsData.groups;
+    allPets.value = petsData.pets;
     pets.value = petsData.pets;
     requests.value = requestsData.requests;
     if (userProfile.value.token) {
@@ -171,6 +197,11 @@ function clearBreedSelection() {
   breedMatches.value = [];
 }
 
+function clearInheritanceSelection() {
+  inheritSelectedPet.value = null;
+  inheritResults.value = [];
+}
+
 async function refreshPets(groupOverride = breedGroup.value) {
   loading.value = true;
   error.value = "";
@@ -192,6 +223,52 @@ async function refreshPets(groupOverride = breedGroup.value) {
 
 function selectBreedGroup(group) {
   refreshPets(group);
+}
+
+function buildInheritanceResults(startPet) {
+  const queue = [startPet];
+  const visited = new Set([startPet.id]);
+
+  while (queue.length) {
+    const currentPet = queue.shift();
+    for (const pet of allPets.value) {
+      if (visited.has(pet.id)) continue;
+      if (!shareEggGroup(currentPet, pet)) continue;
+      visited.add(pet.id);
+      queue.push(pet);
+    }
+  }
+
+  return allPets.value.filter((pet) => visited.has(pet.id) && pet.id !== startPet.id);
+}
+
+function selectInheritanceGroup(group) {
+  inheritGroup.value = group;
+  inheritPetName.value = "";
+  clearInheritanceSelection();
+}
+
+function searchInheritance() {
+  if (!inheritPetName.value.trim()) {
+    error.value = "请输入完整宠物名称。";
+    return;
+  }
+
+  const pet = allPets.value.find((item) => item.name === inheritPetName.value.trim());
+  if (!pet) {
+    error.value = "没有找到这个宠物。";
+    return;
+  }
+
+  error.value = "";
+  inheritSelectedPet.value = pet;
+  inheritResults.value = buildInheritanceResults(pet);
+}
+
+function pickInheritancePet(pet) {
+  inheritPetName.value = pet.name;
+  searchInheritance();
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 async function searchMatches() {
   if (!exactPetName.value.trim()) {
@@ -358,6 +435,7 @@ onMounted(() => {
           <p class="side-copy">{{ currentViewDescription }}</p>
           <div class="segmented-tabs stacked-tabs" role="tablist" aria-label="功能切换">
             <button class="segmented-tab" :class="{ active: view === 'breed' }" @click="view = 'breed'">蛋组查询</button>
+            <button class="segmented-tab" :class="{ active: view === 'inherit' }" @click="view = 'inherit'">炫彩继承</button>
             <button class="segmented-tab" :class="{ active: view === 'board' }" @click="view = 'board'">求蛋广场</button>
           </div>
         </section>
@@ -406,6 +484,28 @@ onMounted(() => {
           </div>
           <button class="primary-btn full-btn" @click="searchMatches">查询配对</button>
           <p class="panel-tip no-margin">右侧卡片支持直接点击，点一下就会自动查询这只宠物的配对结果。</p>
+        </section>
+
+        <section v-else-if="view === 'inherit'" class="side-card">
+          <p class="side-label">继承推导</p>
+          <div class="field">
+            <label>名称模糊搜索</label>
+            <input v-model="inheritSearch" type="text" placeholder="输入起点精灵名称片段" />
+          </div>
+          <div class="field">
+            <label>蛋组筛选</label>
+            <select v-model="inheritGroup">
+              <option value="">全部</option>
+              <option v-for="group in eggGroups" :key="`inherit-${group}`" :value="group">{{ group }}</option>
+            </select>
+          </div>
+          <button class="primary-btn full-btn" @click="selectInheritanceGroup(inheritGroup)">更新列表</button>
+          <div class="field">
+            <label>精确查询起点</label>
+            <input v-model="inheritPetName" list="pet-names" type="text" placeholder="输入完整起点精灵名称" />
+          </div>
+          <button class="primary-btn full-btn" @click="searchInheritance">推导继承</button>
+          <p class="panel-tip no-margin">右侧卡片支持直接点击，点一下就会自动推导这只精灵的炫彩传递结果。</p>
         </section>
 
         <section v-else class="side-card">
@@ -464,6 +564,43 @@ onMounted(() => {
 
           <div v-else class="card-grid wide-grid">
             <article v-for="pet in filteredPets" :key="pet.id" class="pet-card clickable-card" @click="pickPet(pet)">
+              <div class="pet-thumb">
+                <img :src="imageUrl(pet.name)" :alt="pet.name" @error="$event.target.style.visibility = 'hidden'" />
+              </div>
+              <strong>{{ pet.name }}</strong>
+              <span>{{ pet.groups.join(' / ') }}</span>
+            </article>
+          </div>
+        </section>
+
+        <section v-else-if="view === 'inherit'" class="panel panel-main">
+          <div class="chip-row chip-row-top">
+            <button class="filter-chip" :class="{ active: inheritGroup === '' }" @click="selectInheritanceGroup('')">全部</button>
+            <button v-for="group in eggGroups" :key="`inherit-chip-${group}`" class="filter-chip" :class="{ active: inheritGroup === group }" @click="selectInheritanceGroup(group)">{{ group }}</button>
+          </div>
+
+          <div v-if="inheritSelectedPet" class="focus-card">
+            <div class="focus-image">
+              <img :src="imageUrl(inheritSelectedPet.name)" :alt="inheritSelectedPet.name" @error="$event.target.style.visibility = 'hidden'" />
+            </div>
+            <div>
+              <h3>{{ inheritSelectedPet.name }}</h3>
+              <p>{{ inheritSelectedPet.groups.join(' / ') }}</p>
+            </div>
+          </div>
+
+          <div v-if="inheritResults.length" class="card-grid card-grid-small">
+            <article v-for="pet in inheritResults" :key="`inherit-result-${pet.id}`" class="pet-card clickable-card" @click="pickInheritancePet(pet)">
+              <div class="pet-thumb">
+                <img :src="imageUrl(pet.name)" :alt="pet.name" @error="$event.target.style.visibility = 'hidden'" />
+              </div>
+              <strong>{{ pet.name }}</strong>
+              <span>{{ pet.groups.join(' / ') }}</span>
+            </article>
+          </div>
+
+          <div v-else class="card-grid wide-grid">
+            <article v-for="pet in inheritFilteredPets" :key="`inherit-pet-${pet.id}`" class="pet-card clickable-card" @click="pickInheritancePet(pet)">
               <div class="pet-thumb">
                 <img :src="imageUrl(pet.name)" :alt="pet.name" @error="$event.target.style.visibility = 'hidden'" />
               </div>
@@ -571,7 +708,7 @@ onMounted(() => {
     </div>
 
     <datalist id="pet-names">
-      <option v-for="pet in pets" :key="`name-${pet.id}`" :value="pet.name"></option>
+      <option v-for="pet in allPets" :key="`name-${pet.id}`" :value="pet.name"></option>
     </datalist>
 
     <footer class="page-footer">
