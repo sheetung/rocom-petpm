@@ -90,6 +90,7 @@ cp docker-compose.yaml.example docker-compose.yaml
 
 - `VITE_UMAMI_SRC`
 - `VITE_UMAMI_WEBSITE_ID`
+- `VITE_FEEDBACK_EMAIL`
 
 例如：
 
@@ -97,6 +98,7 @@ cp docker-compose.yaml.example docker-compose.yaml
 args:
   VITE_UMAMI_SRC: "https://anal.moontung.top/script.js"
   VITE_UMAMI_WEBSITE_ID: "your-website-id"
+  VITE_FEEDBACK_EMAIL: "your-email@example.com"
 ```
 
 然后启动：

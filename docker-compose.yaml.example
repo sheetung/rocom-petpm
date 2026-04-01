@@ -5,6 +5,7 @@ services:
       args:
         VITE_UMAMI_SRC: ""
         VITE_UMAMI_WEBSITE_ID: ""
+        VITE_FEEDBACK_EMAIL: ""
     container_name: rocom-petplus
     ports:
       - "3000:3000"
