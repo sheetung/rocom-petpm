@@ -57,6 +57,7 @@ const form = ref({
 });
 
 const filteredPets = computed(() => pets.value);
+const visibleInheritancePaths = computed(() => inheritPaths.value.slice(0, 5));
 const inheritFilteredPets = computed(() =>
   allPets.value.filter((pet) => {
     const matchesSearch = !inheritSearch.value.trim() || pet.name.includes(inheritSearch.value.trim());
@@ -717,7 +718,7 @@ onMounted(() => {
                 目标精灵：<strong>{{ inheritTargetPet.name }}</strong>
               </p>
               <p v-if="inheritPaths.length" class="inherit-summary">
-                共找到 <strong>{{ inheritPaths.length }}</strong> 条继承路径
+                共找到 <strong>{{ inheritPaths.length }}</strong> 条继承路径，当前展示前 {{ Math.min(inheritPaths.length, 5) }} 条
               </p>
             </div>
           </div>
@@ -725,7 +726,7 @@ onMounted(() => {
           <div v-if="inheritPaths.length" class="inherit-paths">
             <p class="panel-tip inherit-section-title">继承结果（由短到长）</p>
             <div class="inherit-path-list">
-              <article v-for="(path, index) in inheritPaths" :key="`inherit-path-${index}`" class="inherit-path-card">
+              <article v-for="(path, index) in visibleInheritancePaths" :key="`inherit-path-${index}`" class="inherit-path-card">
                 <strong>方案 {{ index + 1 }}</strong>
                 <span class="inherit-path-text">{{ path.map((pet) => pet.name).join(' -> ') }}</span>
                 <span>共经过 {{ path.length - 1 }} 次传递</span>
@@ -758,11 +759,11 @@ onMounted(() => {
             </div>
           </template>
 
-          <div v-else-if="inheritSelectedPet && !inheritTargetPet" class="banner">
+          <div v-else-if="inheritSelectedPet && !inheritTargetPet && !inheritPaths.length" class="banner">
             这只精灵当前没有可继续扩散的继承结果。
           </div>
 
-          <div v-else class="card-grid wide-grid">
+          <div v-if="!inheritSelectedPet && !inheritTargetPet && !inheritPaths.length" class="card-grid wide-grid">
             <article v-for="pet in inheritFilteredPets" :key="`inherit-pet-${pet.id}`" class="pet-card clickable-card" @click="pickInheritancePet(pet)">
               <div class="pet-thumb">
                 <img :src="imageUrl(pet.name)" :alt="pet.name" @error="$event.target.style.visibility = 'hidden'" />
