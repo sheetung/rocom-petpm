@@ -22,6 +22,8 @@ const selectedPet = ref(null);
 const inheritSelectedPet = ref(null);
 const inheritDirectResults = ref([]);
 const inheritIndirectResults = ref([]);
+const inheritTargetPet = ref(null);
+const inheritPaths = ref([]);
 const requests = ref([]);
 
 const breedSearch = ref("");
@@ -30,6 +32,7 @@ const exactPetName = ref("");
 const inheritSearch = ref("");
 const inheritGroup = ref("");
 const inheritPetName = ref("");
+const inheritTargetPetName = ref("");
 const requestKeyword = ref("");
 const requestWantedPet = ref("");
 const requestUsername = ref("");
@@ -72,7 +75,7 @@ const currentViewDescription = computed(() => {
     return "蛋随母系，部分宠物属于多个蛋组，因此会在多个组别下被查询到。";
   }
   if (view.value === "inherit") {
-    return "选择带有异色或炫彩的起点精灵，按同组传递链推导最终可继承到哪些精灵。";
+    return "选择炫彩起点与目标精灵，按蛋组链路推导可行的继承结果。";
   }
   return "卡片归属到登录用户，支持按用户名查询，并通过完成求蛋保留历史记录。";
 });
@@ -200,6 +203,8 @@ function clearBreedSelection() {
 
 function clearInheritanceSelection() {
   inheritSelectedPet.value = null;
+  inheritTargetPet.value = null;
+  inheritPaths.value = [];
   inheritDirectResults.value = [];
   inheritIndirectResults.value = [];
 }
@@ -227,9 +232,10 @@ function selectBreedGroup(group) {
   refreshPets(group);
 }
 
-function buildInheritanceResults(startPet) {
+function buildInheritanceGraph(startPet) {
   const queue = [{ pet: startPet, depth: 0 }];
   const visited = new Map([[startPet.id, 0]]);
+  const parentMap = new Map();
 
   while (queue.length) {
     const current = queue.shift();
@@ -237,6 +243,7 @@ function buildInheritanceResults(startPet) {
       if (visited.has(pet.id)) continue;
       if (!shareEggGroup(current.pet, pet)) continue;
       visited.set(pet.id, current.depth + 1);
+      parentMap.set(pet.id, current.pet.id);
       queue.push({ pet, depth: current.depth + 1 });
     }
   }
@@ -254,13 +261,71 @@ function buildInheritanceResults(startPet) {
     }
   }
 
-  return { direct, indirect };
+  return { direct, indirect, parentMap, visited };
+}
+
+function buildInheritancePaths(startPet, targetPet, maxPaths = 24) {
+  if (!startPet || !targetPet || startPet.id === targetPet.id) {
+    return [];
+  }
+
+  const reverseGraph = buildInheritanceGraph(targetPet);
+  const shortestDepth = reverseGraph.visited.get(startPet.id);
+  if (shortestDepth === undefined) {
+    return [];
+  }
+
+  const maxDepth = Math.min(shortestDepth + 4, allPets.value.length - 1);
+  const results = [];
+  const stack = [
+    {
+      path: [startPet],
+      visited: new Set([startPet.id])
+    }
+  ];
+
+  while (stack.length && results.length < maxPaths) {
+    const current = stack.pop();
+    const lastPet = current.path[current.path.length - 1];
+    const depthUsed = current.path.length - 1;
+
+    if (lastPet.id === targetPet.id) {
+      results.push([...current.path]);
+      continue;
+    }
+
+    const neighbors = allPets.value
+      .filter((pet) => {
+        if (current.visited.has(pet.id)) return false;
+        if (!shareEggGroup(lastPet, pet)) return false;
+        const remainDepth = reverseGraph.visited.get(pet.id);
+        if (remainDepth === undefined) return false;
+        return depthUsed + 1 + remainDepth <= maxDepth;
+      })
+      .sort((left, right) => left.name.localeCompare(right.name, "zh-Hans-CN"));
+
+    for (let index = neighbors.length - 1; index >= 0; index -= 1) {
+      const pet = neighbors[index];
+      stack.push({
+        path: [...current.path, pet],
+        visited: new Set([...current.visited, pet.id])
+      });
+    }
+  }
+
+  return results.sort((left, right) => {
+    if (left.length !== right.length) return left.length - right.length;
+    return left.map((pet) => pet.name).join(">").localeCompare(right.map((pet) => pet.name).join(">"), "zh-Hans-CN");
+  });
 }
 
 function setInheritancePet(pet) {
   inheritSelectedPet.value = pet;
   inheritPetName.value = pet.name;
-  const result = buildInheritanceResults(pet);
+  inheritTargetPet.value = null;
+  inheritTargetPetName.value = "";
+  inheritPaths.value = [];
+  const result = buildInheritanceGraph(pet);
   inheritDirectResults.value = result.direct;
   inheritIndirectResults.value = result.indirect;
   error.value = "";
@@ -291,6 +356,49 @@ function searchInheritance() {
 function pickInheritancePet(pet) {
   setInheritancePet(pet);
   window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function resolveInheritanceTarget(targetPet) {
+  if (!inheritSelectedPet.value) {
+    error.value = "请先选择起点精灵。";
+    return;
+  }
+
+  const result = buildInheritanceGraph(inheritSelectedPet.value);
+  const canInherit = result.visited.has(targetPet.id) && targetPet.id !== inheritSelectedPet.value.id;
+  inheritDirectResults.value = result.direct;
+  inheritIndirectResults.value = result.indirect;
+  inheritTargetPet.value = targetPet;
+
+  if (!canInherit) {
+    inheritPaths.value = [];
+    error.value = `当前起点 ${inheritSelectedPet.value.name} 无法继承到 ${targetPet.name}。`;
+    return;
+  }
+
+  inheritPaths.value = buildInheritancePaths(inheritSelectedPet.value, targetPet);
+  error.value = "";
+  success.value = `已推导：${inheritSelectedPet.value.name} 可以继承到 ${targetPet.name}，共找到 ${inheritPaths.value.length} 条路径。`;
+}
+
+function searchInheritanceTarget() {
+  if (!inheritTargetPetName.value.trim()) {
+    error.value = "请输入目标精灵名称。";
+    return;
+  }
+
+  const pet = allPets.value.find((item) => item.name === inheritTargetPetName.value.trim());
+  if (!pet) {
+    error.value = "没有找到目标精灵。";
+    return;
+  }
+
+  resolveInheritanceTarget(pet);
+}
+
+function pickInheritanceTarget(pet) {
+  inheritTargetPetName.value = pet.name;
+  resolveInheritanceTarget(pet);
 }
 async function searchMatches() {
   if (!exactPetName.value.trim()) {
@@ -509,25 +617,22 @@ onMounted(() => {
         </section>
 
         <section v-else-if="view === 'inherit'" class="side-card">
-          <p class="side-label">继承推导</p>
+          <p class="side-label">选材继承计算</p>
           <div class="field">
-            <label>名称模糊搜索</label>
-            <input v-model="inheritSearch" type="text" placeholder="输入起点精灵名称片段" />
-          </div>
-          <div class="field">
-            <label>蛋组筛选</label>
-            <select v-model="inheritGroup">
-              <option value="">全部</option>
-              <option v-for="group in eggGroups" :key="`inherit-${group}`" :value="group">{{ group }}</option>
-            </select>
-          </div>
-          <button class="primary-btn full-btn" @click="selectInheritanceGroup(inheritGroup)">更新列表</button>
-          <div class="field">
-            <label>精确查询起点</label>
+            <label>炫彩起点精灵</label>
             <input v-model="inheritPetName" list="pet-names" type="text" placeholder="输入完整起点精灵名称" />
           </div>
-          <button class="primary-btn full-btn" @click="searchInheritance">推导继承</button>
-          <p class="panel-tip no-margin">右侧卡片支持直接点击，点一下就会自动推导这只精灵的炫彩传递结果。</p>
+          <button class="primary-btn full-btn" @click="searchInheritance">设为起点</button>
+          <div class="field">
+            <label>目标精灵</label>
+            <input v-model="inheritTargetPetName" list="pet-names" type="text" placeholder="输入目标精灵名称" />
+          </div>
+          <button class="primary-btn full-btn" @click="searchInheritanceTarget">计算继承</button>
+          <div class="field">
+            <label>起点模糊搜索</label>
+            <input v-model="inheritSearch" type="text" placeholder="筛选右侧起点卡片" />
+          </div>
+          <p class="panel-tip no-margin">右侧卡片点一下会设为起点；如果已经选好起点，再点右侧结果卡片会直接把它作为目标精灵并计算继承路径。</p>
         </section>
 
         <section v-else class="side-card">
@@ -609,13 +714,30 @@ onMounted(() => {
               <p class="side-label">当前起点</p>
               <h3>{{ inheritSelectedPet.name }}</h3>
               <p>{{ inheritSelectedPet.groups.join(' / ') }}</p>
+              <p v-if="inheritTargetPet" class="inherit-summary">
+                目标精灵：<strong>{{ inheritTargetPet.name }}</strong>
+              </p>
+              <p v-if="inheritPaths.length" class="inherit-summary">
+                共找到 <strong>{{ inheritPaths.length }}</strong> 条继承路径
+              </p>
+            </div>
+          </div>
+
+          <div v-if="inheritPaths.length" class="inherit-paths">
+            <p class="panel-tip inherit-section-title">继承结果（由短到长）</p>
+            <div class="inherit-path-list">
+              <article v-for="(path, index) in inheritPaths" :key="`inherit-path-${index}`" class="inherit-path-card">
+                <strong>方案 {{ index + 1 }}</strong>
+                <span class="inherit-path-text">{{ path.map((pet) => pet.name).join(' -> ') }}</span>
+                <span>共经过 {{ path.length - 1 }} 次传递</span>
+              </article>
             </div>
           </div>
 
           <template v-if="inheritDirectResults.length || inheritIndirectResults.length">
             <p v-if="inheritDirectResults.length" class="panel-tip inherit-section-title">直接同组继承</p>
             <div v-if="inheritDirectResults.length" class="card-grid card-grid-small">
-              <article v-for="pet in inheritDirectResults" :key="`inherit-direct-${pet.id}`" class="pet-card clickable-card" @click="pickInheritancePet(pet)">
+              <article v-for="pet in inheritDirectResults" :key="`inherit-direct-${pet.id}`" class="pet-card clickable-card" @click="pickInheritanceTarget(pet)">
                 <div class="pet-thumb">
                   <img :src="imageUrl(pet.name)" :alt="pet.name" @error="$event.target.style.visibility = 'hidden'" />
                 </div>
@@ -626,7 +748,7 @@ onMounted(() => {
 
             <p v-if="inheritIndirectResults.length" class="panel-tip inherit-section-title">间接继承</p>
             <div v-if="inheritIndirectResults.length" class="card-grid card-grid-small">
-              <article v-for="pet in inheritIndirectResults" :key="`inherit-indirect-${pet.id}`" class="pet-card clickable-card" @click="pickInheritancePet(pet)">
+              <article v-for="pet in inheritIndirectResults" :key="`inherit-indirect-${pet.id}`" class="pet-card clickable-card" @click="pickInheritanceTarget(pet)">
                 <div class="pet-thumb">
                   <img :src="imageUrl(pet.name)" :alt="pet.name" @error="$event.target.style.visibility = 'hidden'" />
                 </div>
