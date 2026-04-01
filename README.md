@@ -20,7 +20,7 @@
 - `apps/api/storage`：SQLite 数据文件目录
 - `data/pets.json`：宠物与蛋组种子数据
 - `Dockerfile`：单容器构建文件
-- `docker-compose.yml`：本地或服务器启动文件
+- `docker-compose.yaml.example`：Docker Compose 示例配置
 
 ## 本地开发
 
@@ -78,7 +78,26 @@ docker run -d \
 ### 使用 compose
 
 ```bash
-docker compose up -d --build
+cp docker-compose.yaml.example docker-compose.yaml
+```
+
+按需修改 `docker-compose.yaml` 里的构建参数：
+
+- `VITE_UMAMI_SRC`
+- `VITE_UMAMI_WEBSITE_ID`
+
+例如：
+
+```yaml
+args:
+  VITE_UMAMI_SRC: "https://anal.moontung.top/script.js"
+  VITE_UMAMI_WEBSITE_ID: "your-website-id"
+```
+
+然后启动：
+
+```bash
+docker compose -f docker-compose.yaml up -d --build
 ```
 
 ## 访问方式
@@ -126,5 +145,5 @@ docker rm -f rocom-petplus
 使用 compose 查看日志：
 
 ```bash
-docker compose logs -f
+docker compose -f docker-compose.yaml logs -f
 ```

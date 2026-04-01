@@ -1,7 +1,10 @@
-﻿version: "3.9"
 services:
   rocom-petplus:
-    build: .
+    build:
+      context: .
+      args:
+        VITE_UMAMI_SRC: ""
+        VITE_UMAMI_WEBSITE_ID: ""
     container_name: rocom-petplus
     ports:
       - "3000:3000"

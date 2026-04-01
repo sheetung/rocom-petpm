@@ -1,6 +1,11 @@
 ﻿FROM node:22-alpine AS builder
 WORKDIR /app
 
+ARG VITE_UMAMI_SRC=""
+ARG VITE_UMAMI_WEBSITE_ID=""
+ENV VITE_UMAMI_SRC=$VITE_UMAMI_SRC
+ENV VITE_UMAMI_WEBSITE_ID=$VITE_UMAMI_WEBSITE_ID
+
 COPY package.json package-lock.json ./
 COPY apps/web/package.json ./apps/web/package.json
 COPY apps/api/package.json ./apps/api/package.json
