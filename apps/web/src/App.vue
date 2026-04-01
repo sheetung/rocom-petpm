@@ -20,7 +20,8 @@ const pets = ref([]);
 const breedMatches = ref([]);
 const selectedPet = ref(null);
 const inheritSelectedPet = ref(null);
-const inheritResults = ref([]);
+const inheritDirectResults = ref([]);
+const inheritIndirectResults = ref([]);
 const requests = ref([]);
 
 const breedSearch = ref("");
@@ -199,7 +200,8 @@ function clearBreedSelection() {
 
 function clearInheritanceSelection() {
   inheritSelectedPet.value = null;
-  inheritResults.value = [];
+  inheritDirectResults.value = [];
+  inheritIndirectResults.value = [];
 }
 
 async function refreshPets(groupOverride = breedGroup.value) {
@@ -226,20 +228,43 @@ function selectBreedGroup(group) {
 }
 
 function buildInheritanceResults(startPet) {
-  const queue = [startPet];
-  const visited = new Set([startPet.id]);
+  const queue = [{ pet: startPet, depth: 0 }];
+  const visited = new Map([[startPet.id, 0]]);
 
   while (queue.length) {
-    const currentPet = queue.shift();
+    const current = queue.shift();
     for (const pet of allPets.value) {
       if (visited.has(pet.id)) continue;
-      if (!shareEggGroup(currentPet, pet)) continue;
-      visited.add(pet.id);
-      queue.push(pet);
+      if (!shareEggGroup(current.pet, pet)) continue;
+      visited.set(pet.id, current.depth + 1);
+      queue.push({ pet, depth: current.depth + 1 });
     }
   }
 
-  return allPets.value.filter((pet) => visited.has(pet.id) && pet.id !== startPet.id);
+  const direct = [];
+  const indirect = [];
+
+  for (const pet of allPets.value) {
+    const depth = visited.get(pet.id);
+    if (pet.id === startPet.id || depth === undefined) continue;
+    if (depth === 1) {
+      direct.push(pet);
+    } else {
+      indirect.push({ ...pet, inheritDepth: depth });
+    }
+  }
+
+  return { direct, indirect };
+}
+
+function setInheritancePet(pet) {
+  inheritSelectedPet.value = pet;
+  inheritPetName.value = pet.name;
+  const result = buildInheritanceResults(pet);
+  inheritDirectResults.value = result.direct;
+  inheritIndirectResults.value = result.indirect;
+  error.value = "";
+  success.value = `已选定起点精灵：${pet.name}，当前可推导 ${result.direct.length + result.indirect.length} 只可继承精灵。`;
 }
 
 function selectInheritanceGroup(group) {
@@ -260,14 +285,11 @@ function searchInheritance() {
     return;
   }
 
-  error.value = "";
-  inheritSelectedPet.value = pet;
-  inheritResults.value = buildInheritanceResults(pet);
+  setInheritancePet(pet);
 }
 
 function pickInheritancePet(pet) {
-  inheritPetName.value = pet.name;
-  searchInheritance();
+  setInheritancePet(pet);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 async function searchMatches() {
@@ -584,19 +606,39 @@ onMounted(() => {
               <img :src="imageUrl(inheritSelectedPet.name)" :alt="inheritSelectedPet.name" @error="$event.target.style.visibility = 'hidden'" />
             </div>
             <div>
+              <p class="side-label">当前起点</p>
               <h3>{{ inheritSelectedPet.name }}</h3>
               <p>{{ inheritSelectedPet.groups.join(' / ') }}</p>
             </div>
           </div>
 
-          <div v-if="inheritResults.length" class="card-grid card-grid-small">
-            <article v-for="pet in inheritResults" :key="`inherit-result-${pet.id}`" class="pet-card clickable-card" @click="pickInheritancePet(pet)">
-              <div class="pet-thumb">
-                <img :src="imageUrl(pet.name)" :alt="pet.name" @error="$event.target.style.visibility = 'hidden'" />
-              </div>
-              <strong>{{ pet.name }}</strong>
-              <span>{{ pet.groups.join(' / ') }}</span>
-            </article>
+          <template v-if="inheritDirectResults.length || inheritIndirectResults.length">
+            <p v-if="inheritDirectResults.length" class="panel-tip inherit-section-title">直接同组继承</p>
+            <div v-if="inheritDirectResults.length" class="card-grid card-grid-small">
+              <article v-for="pet in inheritDirectResults" :key="`inherit-direct-${pet.id}`" class="pet-card clickable-card" @click="pickInheritancePet(pet)">
+                <div class="pet-thumb">
+                  <img :src="imageUrl(pet.name)" :alt="pet.name" @error="$event.target.style.visibility = 'hidden'" />
+                </div>
+                <strong>{{ pet.name }}</strong>
+                <span>{{ pet.groups.join(' / ') }}</span>
+              </article>
+            </div>
+
+            <p v-if="inheritIndirectResults.length" class="panel-tip inherit-section-title">间接继承</p>
+            <div v-if="inheritIndirectResults.length" class="card-grid card-grid-small">
+              <article v-for="pet in inheritIndirectResults" :key="`inherit-indirect-${pet.id}`" class="pet-card clickable-card" @click="pickInheritancePet(pet)">
+                <div class="pet-thumb">
+                  <img :src="imageUrl(pet.name)" :alt="pet.name" @error="$event.target.style.visibility = 'hidden'" />
+                </div>
+                <strong>{{ pet.name }}</strong>
+                <span>{{ pet.groups.join(' / ') }}</span>
+                <span>需经过 {{ pet.inheritDepth - 1 }} 层传递</span>
+              </article>
+            </div>
+          </template>
+
+          <div v-else-if="inheritSelectedPet" class="banner">
+            这只精灵当前没有可继续扩散的继承结果。
           </div>
 
           <div v-else class="card-grid wide-grid">

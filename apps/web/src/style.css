@@ -108,6 +108,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .focus-image { height: 120px; }
 .focus-card h3 { margin: 0 0 4px; font-size: 24px; }
 .focus-card p { margin: 0; color: #7d7484; }
+.inherit-section-title { margin: 6px 0 12px; font-weight: 700; }
 .chip-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
 .chip-row-top { margin-bottom: 18px; }
 .filter-chip { padding: 10px 16px; border-radius: 999px; color: #5b5062; background: #f8efe8; }
