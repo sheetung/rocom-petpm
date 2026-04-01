@@ -328,7 +328,7 @@ onMounted(() => {
         <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank" rel="noreferrer">CC BY-NC-SA 4.0（署名-非商业性使用-相同方式共享）</a>
       </span>
       </div>
-      <a v-if="feedbackEmail" class="feedback-mail" :href="`mailto:${feedbackEmail}`">反馈邮箱：{{ feedbackEmail }}</a>
+      <a v-if="feedbackEmail" class="feedback-mail" :href="`mailto:${feedbackEmail}`">问题邮箱</a>
     </section>
 
     <p v-if="error" class="banner banner-error">{{ error }}</p>
@@ -558,7 +558,7 @@ onMounted(() => {
     <footer class="page-footer">
       <span>作者：sheetung</span>
       <span>版本：{{ appVersion }}</span>
-      <a href="https://github.com/sheetung/rocom-petpm" target="_blank" rel="noreferrer">开源地址：https://github.com/sheetung/rocom-petpm</a>
+      <a href="https://github.com/sheetung/rocom-petpm" target="_blank" rel="noreferrer">开源地址</a>
     </footer>
   </div>
 </template>
