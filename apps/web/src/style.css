@@ -26,8 +26,9 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .hero-compact h1 { margin: 0; font-size: clamp(30px, 4vw, 50px); }
 .attribution-bar {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px 18px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 18px;
   margin: 0 0 16px;
   padding: 14px 18px;
   border: 1px solid rgba(211,191,153,.28);
@@ -36,9 +37,16 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   color: #7d7484;
   line-height: 1.7;
 }
+.attribution-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  min-width: 0;
+}
 .attribution-bar span { display: inline-flex; flex-wrap: wrap; gap: 4px; }
 .attribution-bar a { color: #b85e72; text-decoration: none; font-weight: 700; }
 .attribution-bar a:hover { text-decoration: underline; }
+.feedback-mail { flex-shrink: 0; white-space: nowrap; }
 .eyebrow { margin: 0; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; }
 .banner { margin: 0 0 16px; padding: 14px 18px; border-radius: 18px; background: rgba(255,255,255,.75); }
 .banner-error { color: #9e3658; background: #fff0f3; }
@@ -128,6 +136,18 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .request-meta dt { color: #8a7d89; font-size: 13px; }
 .request-meta dd { margin: 0; font-weight: 700; word-break: break-all; }
 .request-note { margin: 14px 0 0; line-height: 1.7; }
+.page-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  justify-content: center;
+  margin: 22px 0 0;
+  padding: 18px 12px 8px;
+  color: #8a7d89;
+  font-size: 14px;
+}
+.page-footer a { color: #b85e72; text-decoration: none; font-weight: 700; }
+.page-footer a:hover { text-decoration: underline; }
 .modal-backdrop { position: fixed; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(45, 27, 33, .32); backdrop-filter: blur(6px); }
 .modal-card { width: min(480px, 100%); }
 .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
@@ -142,6 +162,8 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .page-shell { padding: 14px; }
   .hero, .side-card, .panel, .modal-card { padding: 18px; border-radius: 24px; }
   .attribution-bar { padding: 12px 14px; border-radius: 16px; }
+  .attribution-bar { align-items: flex-start; flex-direction: column; }
+  .feedback-mail { white-space: normal; }
   .focus-card { grid-template-columns: 1fr; }
   .focus-image { width: 120px; }
   .user-actions { justify-content: flex-start; }

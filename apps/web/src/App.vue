@@ -2,6 +2,8 @@
 import { computed, onMounted, ref, watch } from "vue";
 
 const apiBase = import.meta.env.VITE_API_BASE_URL || "";
+const feedbackEmail = import.meta.env.VITE_FEEDBACK_EMAIL || "";
+const appVersion = import.meta.env.VITE_APP_VERSION || "v1.0.0";
 const view = ref("breed");
 const loading = ref(false);
 const saving = ref(false);
@@ -312,6 +314,7 @@ onMounted(() => {
     </div>
 
     <section class="attribution-bar">
+      <div class="attribution-links">
       <span>
         蛋组数据来源：
         <a href="https://github.com/MIXHS/txm.github.io" target="_blank" rel="noreferrer">MIXHS/txm.github.io</a>
@@ -324,6 +327,8 @@ onMounted(() => {
         遵循开源协议
         <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank" rel="noreferrer">CC BY-NC-SA 4.0（署名-非商业性使用-相同方式共享）</a>
       </span>
+      </div>
+      <a v-if="feedbackEmail" class="feedback-mail" :href="`mailto:${feedbackEmail}`">反馈邮箱：{{ feedbackEmail }}</a>
     </section>
 
     <p v-if="error" class="banner banner-error">{{ error }}</p>
@@ -549,6 +554,12 @@ onMounted(() => {
     <datalist id="pet-names">
       <option v-for="pet in pets" :key="`name-${pet.id}`" :value="pet.name"></option>
     </datalist>
+
+    <footer class="page-footer">
+      <span>作者：sheetung</span>
+      <span>版本：{{ appVersion }}</span>
+      <a href="https://github.com/sheetung/rocom-petpm" target="_blank" rel="noreferrer">开源地址：https://github.com/sheetung/rocom-petpm</a>
+    </footer>
   </div>
 </template>
 
