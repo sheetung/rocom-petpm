@@ -277,15 +277,15 @@ function buildInheritancePaths(startPet, targetPet, maxPaths = 24) {
 
   const maxDepth = Math.min(shortestDepth + 4, allPets.value.length - 1);
   const results = [];
-  const stack = [
+  const queue = [
     {
       path: [startPet],
       visited: new Set([startPet.id])
     }
   ];
 
-  while (stack.length && results.length < maxPaths) {
-    const current = stack.pop();
+  while (queue.length && results.length < maxPaths) {
+    const current = queue.shift();
     const lastPet = current.path[current.path.length - 1];
     const depthUsed = current.path.length - 1;
 
@@ -304,9 +304,8 @@ function buildInheritancePaths(startPet, targetPet, maxPaths = 24) {
       })
       .sort((left, right) => left.name.localeCompare(right.name, "zh-Hans-CN"));
 
-    for (let index = neighbors.length - 1; index >= 0; index -= 1) {
-      const pet = neighbors[index];
-      stack.push({
+    for (const pet of neighbors) {
+      queue.push({
         path: [...current.path, pet],
         visited: new Set([...current.visited, pet.id])
       });
@@ -734,7 +733,7 @@ onMounted(() => {
             </div>
           </div>
 
-          <template v-if="inheritDirectResults.length || inheritIndirectResults.length">
+          <template v-if="!inheritTargetPet && (inheritDirectResults.length || inheritIndirectResults.length)">
             <p v-if="inheritDirectResults.length" class="panel-tip inherit-section-title">直接同组继承</p>
             <div v-if="inheritDirectResults.length" class="card-grid card-grid-small">
               <article v-for="pet in inheritDirectResults" :key="`inherit-direct-${pet.id}`" class="pet-card clickable-card" @click="pickInheritanceTarget(pet)">
@@ -759,7 +758,7 @@ onMounted(() => {
             </div>
           </template>
 
-          <div v-else-if="inheritSelectedPet" class="banner">
+          <div v-else-if="inheritSelectedPet && !inheritTargetPet" class="banner">
             这只精灵当前没有可继续扩散的继承结果。
           </div>
 
