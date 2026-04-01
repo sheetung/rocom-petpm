@@ -6,6 +6,11 @@
 - 可配对宠物查询
 - 求蛋广场发布与检索
 
+## 数据来源
+
+- 蛋组数据来源：[MIXHS/txm.github.io](https://github.com/MIXHS/txm.github.io)
+- 精灵立绘数据来源：[洛克王国 Wiki](https://wiki.biligame.com/rocom/)
+
 ## 技术栈
 
 - Vue 3 + Vite
