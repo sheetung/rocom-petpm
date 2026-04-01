@@ -402,7 +402,7 @@ onMounted(() => {
 <template>
   <div class="page-shell">
     <div class="hero hero-compact">
-      <h1>洛克王国蛋组查询与求蛋广场</h1>
+      <h1>洛克王国精灵广场</h1>
     </div>
 
     <section class="attribution-bar">
