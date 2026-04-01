@@ -152,3 +152,7 @@ docker rm -f rocom-petplus
 ```bash
 docker compose -f docker-compose.yaml logs -f
 ```
+
+## 许可协议
+
+本项目采用 [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans) 许可协议发布。
