@@ -136,6 +136,18 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .request-meta dt { color: #8a7d89; font-size: 13px; }
 .request-meta dd { margin: 0; font-weight: 700; word-break: break-all; }
 .request-note { margin: 14px 0 0; line-height: 1.7; }
+.request-hover-card:hover { transform: translateY(-3px); border-color: #efb7a8; box-shadow: 0 14px 30px rgba(152,105,70,.12); }
+.inline-copy-btn {
+  padding: 0;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  background: transparent;
+  cursor: pointer;
+}
+.inline-copy-btn:hover { color: #c15f74; text-decoration: underline; }
 .page-footer {
   display: flex;
   flex-wrap: wrap;

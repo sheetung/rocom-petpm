@@ -296,6 +296,21 @@ async function completeRequestCard(card) {
   }
 }
 
+async function copyContactId(contactId) {
+  if (!contactId) {
+    error.value = "没有可复制的联系 ID。";
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(String(contactId));
+    error.value = "";
+    success.value = `已复制联系 ID：${contactId}`;
+  } catch {
+    error.value = "复制失败，请手动复制。";
+  }
+}
+
 watch(view, () => {
   error.value = "";
   success.value = "";
@@ -468,7 +483,7 @@ onMounted(() => {
             <button class="primary-btn" @click="showRequestModal = true">发布求蛋卡片</button>
           </div>
           <div class="board-grid wide-board-grid">
-            <article v-for="card in requests" :key="card.id" class="request-card">
+            <article v-for="card in requests" :key="card.id" class="request-card clickable-card request-hover-card">
               <div class="request-top">
                 <span class="badge" :class="{ 'badge-muted': card.status === 'completed' }">{{ card.status === 'completed' ? '已完成' : '求蛋中' }}</span>
                 <time>{{ card.completed_at || card.created_at }}</time>
@@ -481,7 +496,11 @@ onMounted(() => {
                 </div>
                 <div>
                   <dt>联系 ID</dt>
-                  <dd>{{ card.userContactId || card.contact_id }}</dd>
+                  <dd>
+                    <button class="inline-copy-btn" @click="copyContactId(card.userContactId || card.contact_id)">
+                      {{ card.userContactId || card.contact_id }}
+                    </button>
+                  </dd>
                 </div>
                 <div>
                   <dt>用户名</dt>
