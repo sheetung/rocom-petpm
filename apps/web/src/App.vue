@@ -311,6 +311,21 @@ onMounted(() => {
       <h1>洛克王国蛋组查询与求蛋广场</h1>
     </div>
 
+    <section class="attribution-bar">
+      <span>
+        蛋组数据来源：
+        <a href="https://github.com/MIXHS/txm.github.io" target="_blank" rel="noreferrer">MIXHS/txm.github.io</a>
+      </span>
+      <span>
+        精灵立绘数据来源：
+        <a href="https://wiki.biligame.com/rocom/" target="_blank" rel="noreferrer">洛克王国 Wiki</a>
+      </span>
+      <span>
+        遵循开源协议
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank" rel="noreferrer">CC BY-NC-SA 4.0（署名-非商业性使用-相同方式共享）</a>
+      </span>
+    </section>
+
     <p v-if="error" class="banner banner-error">{{ error }}</p>
     <p v-if="success" class="banner banner-success">{{ success }}</p>
     <p v-if="loading" class="banner">正在加载数据...</p>
