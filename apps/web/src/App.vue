@@ -858,13 +858,9 @@ onMounted(() => {
     </datalist>
 
     <footer class="page-footer">
-      <span>作者：sheetung</span>
-      <span>版本：{{ appVersion }}</span>
-      <span>蛋组数据来源：<a href="https://github.com/MIXHS/txm.github.io" target="_blank" rel="noreferrer">MIXHS/txm.github.io</a></span>
-      <span>精灵立绘数据来源：<a href="https://wiki.biligame.com/rocom/" target="_blank" rel="noreferrer">洛克王国 Wiki</a></span>
-      <span>遵循开源协议 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank" rel="noreferrer">CC BY-NC-SA 4.0</a></span>
-      <span v-if="feedbackEmail">反馈邮箱：<a :href="`mailto:${feedbackEmail}`">{{ feedbackEmail }}</a></span>
-      <span><a href="https://github.com/sheetung/rocom-petpm" target="_blank" rel="noreferrer">开源地址</a></span>
+      <span>作者：<a href="https://github.com/sheetung" target="_blank" rel="noreferrer">sheetung</a> | 版本：{{ appVersion }} | <a href="https://github.com/sheetung/rocom-petpm" target="_blank" rel="noreferrer">开源地址</a></span>
+      <span>蛋组数据来源：<a href="https://github.com/MIXHS/txm.github.io" target="_blank" rel="noreferrer">MIXHS/txm.github.io</a> | 精灵立绘数据来源：<a href="https://wiki.biligame.com/rocom/" target="_blank" rel="noreferrer">洛克王国 Wiki</a></span>
+      <span>遵循开源协议 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank" rel="noreferrer">CC BY-NC-SA 4.0</a><template v-if="feedbackEmail"> | <a :href="`mailto:${feedbackEmail}`">反馈邮箱：{{ feedbackEmail }}</a></template></span>
     </footer>
   </div>
 </template>
