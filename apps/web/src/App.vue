@@ -535,24 +535,6 @@ onMounted(() => {
       <h1>洛克王国精灵广场</h1>
     </div>
 
-    <section class="attribution-bar">
-      <div class="attribution-links">
-      <span>
-        蛋组数据来源：
-        <a href="https://github.com/MIXHS/txm.github.io" target="_blank" rel="noreferrer">MIXHS/txm.github.io</a>
-      </span>
-      <span>
-        精灵立绘数据来源：
-        <a href="https://wiki.biligame.com/rocom/" target="_blank" rel="noreferrer">洛克王国 Wiki</a>
-      </span>
-      <span>
-        遵循开源协议
-        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank" rel="noreferrer">CC BY-NC-SA 4.0</a>
-      </span>
-      </div>
-      <a v-if="feedbackEmail" class="feedback-mail" :href="`mailto:${feedbackEmail}`">问题邮箱</a>
-    </section>
-
     <p v-if="error" class="banner banner-error">{{ error }}</p>
     <p v-if="success" class="banner banner-success">{{ success }}</p>
     <p v-if="loading" class="banner">正在加载数据...</p>
@@ -878,7 +860,11 @@ onMounted(() => {
     <footer class="page-footer">
       <span>作者：sheetung</span>
       <span>版本：{{ appVersion }}</span>
-      <a href="https://github.com/sheetung/rocom-petpm" target="_blank" rel="noreferrer">开源地址</a>
+      <span>蛋组数据来源：<a href="https://github.com/MIXHS/txm.github.io" target="_blank" rel="noreferrer">MIXHS/txm.github.io</a></span>
+      <span>精灵立绘数据来源：<a href="https://wiki.biligame.com/rocom/" target="_blank" rel="noreferrer">洛克王国 Wiki</a></span>
+      <span>遵循开源协议 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank" rel="noreferrer">CC BY-NC-SA 4.0</a></span>
+      <span v-if="feedbackEmail">反馈邮箱：<a :href="`mailto:${feedbackEmail}`">{{ feedbackEmail }}</a></span>
+      <span><a href="https://github.com/sheetung/rocom-petpm" target="_blank" rel="noreferrer">开源地址</a></span>
     </footer>
   </div>
 </template>
